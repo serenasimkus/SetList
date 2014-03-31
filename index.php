@@ -1,4 +1,5 @@
 <?php
+session_start();
 ini_set('display_errors', 'On'); 
 require_once "connection.php";
 
@@ -38,7 +39,7 @@ oci_close($conn);
 					<ul class="nav navbar-nav pull-right">
 						<li><?php
         						if($_SESSION['User']){
-                					echo($_SESSION['User']['username']);
+                					echo("Welcome, ".$_SESSION['User']);
         						} else {
                 					echo('<a href="login.php">Log In</a>');
         						}
