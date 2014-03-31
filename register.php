@@ -1,20 +1,20 @@
 <?php
-session_start();
-ini_set('display_errors', 'On'); 
-require_once "connection.php";
+	session_start();
+	ini_set('display_errors', 'On'); 
+	require_once "connection.php";
 
-if (isset($_POST['username']) && isset($_POST['password'])) {
+	if (isset($_POST['username']) && isset($_POST['password'])) {
 
-	$username = $_POST['username'];
-	$password = $_POST['password'];
-	$birthdate = $_POST['birthdate'];
-	$gender = $_POST['gender'];
+		$username = $_POST['username'];
+		$password = $_POST['password'];
+		$birthdate = $_POST['birthdate'];
+		$gender = $_POST['gender'];
 
-	$_SESSION['name'] = $username;
-	$_SESSION['password'] = $password;
-	// $_SESSION['birthdate'] = $birthdate;
-	// $_SESSION['gender'] = $gender;
-}
+		$_SESSION['name'] = $username;
+		$_SESSION['password'] = $password;
+		// $_SESSION['birthdate'] = $birthdate;
+		// $_SESSION['gender'] = $gender;
+	}
 	$sql = "select * from users where username='$username'";
 
 	$stmt = oci_parse($conn, $sql);
@@ -36,6 +36,22 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
 	oci_commit($conn);
 
+	$sql = "select * from users where username='$username' and password='$password'";
+
+	$stmt = oci_parse($conn, $sql);
+	oci_execute($stmt);
+
+	$err = oci_error($stmt);
+	if ($err) {
+		echo $err;
+	}
+
+	while ($res = oci_fetch_row($stmt))
+	{
+		$_SESSION['User'] = $res[0];
+		header('Location: index.php');
+	}  
+
 	// while ($res = oci_fetch_row($stmt))
 	// {
 	// 	$_SESSION['User'] = $res[0];
@@ -53,5 +69,5 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 	// }
 
 
-oci_close($conn);
+	oci_close($conn);
 ?>
