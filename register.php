@@ -30,6 +30,8 @@
 		$stmt = oci_parse($conn, $sql2);
 		oci_execute($stmt);
 
+		oci_commit($conn);
+
 		$sql = "select * from users where username='$username' and password='$password'";
 
 		$stmt = oci_parse($conn, $sql);
@@ -50,7 +52,7 @@
 		echo "Sign up failed because the user login already exists. Please try again.";
 	}
 
-	oci_commit($conn);
-	
+	//oci_commit($conn);
+
 	oci_close($conn);
 ?>

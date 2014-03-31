@@ -39,7 +39,7 @@ oci_close($conn);
 					<ul class="nav navbar-nav pull-right">
 						<li><?php
         					if($_SESSION['User']) {
-        						echo('<li><a href="#">Welcome, $_SESSION['User']</a></li>');
+								echo('<li><a href="#">Welcome, '.$_SESSION['User'].'</a></li>');
                 				echo('<li><a href="logout.php">Log Out</a></li>');
         					} else {
                 				echo('<li><a href="login.php">Log In</a></li>');

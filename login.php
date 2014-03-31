@@ -1,44 +1,34 @@
 <?php
-session_start();
-ini_set('display_errors', 'On'); 
-require_once "connection.php";
+	session_start();
+	ini_set('display_errors', 'On'); 
+	require_once "connection.php";
 
-if (isset($_POST['username']) && isset($_POST['password'])) {
+	if (isset($_POST['username']) && isset($_POST['password'])) {
 
-	$username = $_POST['username'];
-	$password = $_POST['password'];
+		$username = $_POST['username'];
+		$password = $_POST['password'];
 
-	$_SESSION['name'] = $username;
-	$_SESSION['password'] = $password;
+		$_SESSION['name'] = $username;
+		$_SESSION['password'] = $password;
 
-	$sql = "select * from users where username='$username' and password='$password'";
+		$sql = "select * from users where username='$username' and password='$password'";
 
-	$stmt = oci_parse($conn, $sql);
-	oci_execute($stmt);
+		$stmt = oci_parse($conn, $sql);
+		oci_execute($stmt);
 
-	$err = oci_error($stmt);
-	if ($err) {
-		echo $err;
+		$err = oci_error($stmt);
+		if ($err) {
+			echo $err;
+		}
+
+		while ($res = oci_fetch_row($stmt))
+		{
+			$_SESSION['User'] = $res[0];
+			header('Location: index.php');
+		}  
 	}
-
-	while ($res = oci_fetch_row($stmt))
-	{
-		$_SESSION['User'] = $res[0];
-		header('Location: index.php');
-	}  
-
-	// if (oci_fetch_array($stmt, OCI_NUM)) {
-	// 	header('Location: index.php');
-	// }
-	// else
-	// 	echo "Login failed. Please try again.";
-
-	// while (($row = oci_fetch_array($stmt, OCI_NUM))) {
-	// 	echo $row[0] . "<br>\n";
-	// }
-
-}
-oci_close($conn);
+	
+	oci_close($conn);
 ?>
 
 <html>
