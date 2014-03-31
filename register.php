@@ -29,45 +29,28 @@
 		sql2 = "insert into users values ('$username','$password','$birthdate','$gender')";
 		$stmt = oci_parse($conn, $sql2);
 		oci_execute($stmt);
-		header('Location: index.php');
+
+		$sql = "select * from users where username='$username' and password='$password'";
+
+		$stmt = oci_parse($conn, $sql);
+		oci_execute($stmt);
+
+		$err = oci_error($stmt);
+		if ($err) {
+			echo $err;
+		}
+
+		while ($res = oci_fetch_row($stmt))
+		{
+			$_SESSION['User'] = $res[0];
+			header('Location: index.php');
+		}  
+
 	} else if ($username) {
 		echo "Sign up failed because the user login already exists. Please try again.";
 	}
 
 	oci_commit($conn);
-
-	$sql = "select * from users where username='$username' and password='$password'";
-
-	$stmt = oci_parse($conn, $sql);
-	oci_execute($stmt);
-
-	$err = oci_error($stmt);
-	if ($err) {
-		echo $err;
-	}
-
-	while ($res = oci_fetch_row($stmt))
-	{
-		$_SESSION['User'] = $res[0];
-		header('Location: index.php');
-	}  
-
-	// while ($res = oci_fetch_row($stmt))
-	// {
-	// 	$_SESSION['User'] = $res[0];
-	// 	header('Location: index.php');
-	// }  
-
-	// if (oci_fetch_array($stmt, OCI_NUM)) {
-	// 	header('Location: index.php');
-	// }
-	// else
-	// 	echo "Login failed. Please try again.";
-
-	// while (($row = oci_fetch_array($stmt, OCI_NUM))) {
-	// 	echo $row[0] . "<br>\n";
-	// }
-
-
+	
 	oci_close($conn);
 ?>
