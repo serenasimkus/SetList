@@ -37,10 +37,10 @@ oci_close($conn);
 					</ul>
 					<ul class="nav navbar-nav pull-right">
 						<li><?php
-        						if($_SESSION[‘User’]){
-                					echo($_SESSION[‘User’][‘username’]);
+        						if($_SESSION['User']){
+                					echo($_SESSION['User']['username']);
         						} else {
-                					echo(‘<a href=“login.php”>Log In</a>’);
+                					echo('<a href="login.php">Log In</a>');
         						}
 							?></li>
 					</ul>
