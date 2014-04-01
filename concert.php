@@ -1,16 +1,26 @@
 <?php
-session_start();
-ini_set('display_errors', 'On'); 
-require_once "connection.php";
+	session_start();
+	ini_set('display_errors', 'On');
+	require_once "connection.php";
+	$id = $_GET['id'];
 
-$stmt = oci_parse($conn, "select * from artists");
-oci_execute($stmt, OCI_DEFAULT);
-$artist = array();
-while ($res = oci_fetch_row($stmt))                                                        
-{
-	$artist[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
-}
-oci_close($conn);
+	$sql = "select * from concerts where concert_id='$id'";
+
+	$stmt = oci_parse($conn, $sql);
+	oci_execute($stmt);
+
+	$err = oci_error($stmt);
+	if ($err) {
+		echo $err;
+	}
+
+	$concert_info = array();
+
+	while ($res = oci_fetch_assoc($stmt))                                                        
+	{
+		$concert_info[] = $res;
+	}  
+	oci_close($conn);
 ?>
 
 <html>
@@ -35,8 +45,7 @@ oci_close($conn);
 				<div class="collapse navbar-collapse">
 					<ul class="nav navbar-nav">
 						<li class="active"><a href="/~sks2187/w4111/index.php">Home</a></li>
-						<li><a href="/~sks2187/w4111/artist.php">Artists</a></li>
-						<li><a href="/~sks2187/w4111/concert.php">Concerts</a></li>
+						<li><a href="#contact">Contact</a></li>
 					</ul>
 					<ul class="nav navbar-nav pull-right">
 						<li><?php
@@ -55,9 +64,9 @@ oci_close($conn);
 		<div class="container">
 			<h3>Welcome to SetList!</h3>
 			<?php
-				foreach($artist as $a) {
-					echo $a;
-				}
+				echo ("<h3>Concert name: ".$concert_info[0]['NAME']."</h3>");
+				echo ("<h4>Date: ".$concert_info[0]['CONCERT_DATE']."</h4>");
+				echo ("<p>Start time: ".$concert_info[0]['START_TIME']."<p>");
 			?>
 		</div>
 	</body>

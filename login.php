@@ -27,7 +27,7 @@
 			header('Location: index.php');
 		}  
 	}
-	
+
 	oci_close($conn);
 ?>
 
@@ -48,12 +48,13 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-				<a class="navbar-brand" href="#">SetList</a>
+				<a class="navbar-brand" href="/~sks2187/w4111/index.php">SetList</a>
 			</div>
 				<div class="collapse navbar-collapse">
 					<ul class="nav navbar-nav">
-						<li class="active"><a href="#">Home</a></li>
-						<li><a href="#contact">Contact</a></li>
+						<li class="active"><a href="/~sks2187/w4111/index.php">Home</a></li>
+						<li><a href="/~sks2187/w4111/artist.php">Artists</a></li>
+						<li><a href="/~sks2187/w4111/concert.php">Concerts</a></li>
 					</ul>
 					<ul class="nav navbar-nav pull-right">
 						<li><a href="#login">Login</a></li>
