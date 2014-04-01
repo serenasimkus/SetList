@@ -7,10 +7,10 @@
 
 		$username = $_POST['username'];
 		$password = $_POST['password'];
-		if(isset($_POST['birthdate'])) {
+		if (isset($_POST['birthdate'])) {
 			$birthdate = $_POST['birthdate'];
 		}
-		if(isset($_POST['gender'])) {
+		if (isset($_POST['gender'])) {
 			$gender = $_POST['gender'];
 		}
 
@@ -29,7 +29,7 @@
 			echo $err;
 		}
 
-		if (!oci_fetch_row($stmt) and $username) {
+		if (!oci_fetch_row($stmt) && $username) {
 			$sql2 = "insert into users values ('$username','$password','$birthdate','$gender')";
 			$stmt = oci_parse($conn, $sql2);
 			oci_execute($stmt);
