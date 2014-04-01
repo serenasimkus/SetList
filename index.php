@@ -1,16 +1,16 @@
 <?php
-session_start();
-ini_set('display_errors', 'On'); 
-require_once "connection.php";
+	session_start();
+	ini_set('display_errors', 'On'); 
+	require_once "connection.php";
 
-$stmt = oci_parse($conn, "select * from artists");
-oci_execute($stmt, OCI_DEFAULT);
-$artist = array();
-while ($res = oci_fetch_row($stmt))                                                        
-{
-	$artist[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
-}
-oci_close($conn);
+	$stmt = oci_parse($conn, "select * from artists");
+	oci_execute($stmt, OCI_DEFAULT);
+	$artist = array();
+	while ($res = oci_fetch_row($stmt))                                                        
+	{
+		$artist[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+	}
+	oci_close($conn);
 ?>
 
 <html>
@@ -37,6 +37,7 @@ oci_close($conn);
 						<li class="active"><a href="/~sks2187/w4111/index.php">Home</a></li>
 						<li><a href="/~sks2187/w4111/artist.php">Artists</a></li>
 						<li><a href="/~sks2187/w4111/concert.php">Concerts</a></li>
+						<li><a href="/~sks2187/w4111/venue.php">Venues</a></li>
 					</ul>
 					<ul class="nav navbar-nav pull-right">
 						<li><?php

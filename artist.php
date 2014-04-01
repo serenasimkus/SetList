@@ -16,7 +16,7 @@
 
 	if (isset($_GET['genre'])) {
 		$genre = urldecode($_GET['genre']);
-		// search_by_genre();
+		searchByGenre($conn, $genre);
 	} else {
 		$genre = false;
 	}
@@ -39,6 +39,25 @@
 	}
 
 	$options = array_unique($options);
+
+	function searchByGenre($conn, $genre) {
+		$sql = "select * from artists where genre='$genre'";
+
+		$stmt = oci_parse($conn, $sql);
+		oci_execute($stmt);
+
+		$err = oci_error($stmt);
+		if ($err) {
+			echo $err;
+		}
+
+		$artists = array();
+
+		while ($res = oci_fetch_row($stmt))                                                        
+		{
+			$artists[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+		} 
+	}
 
 	if ($id) {
 		$sql = "select * from artists where artist_id='$id'";
@@ -74,23 +93,23 @@
 		{
 			$artist_info[] = $res;
 		}  
-	} elseif ($genre) {
-		$sql = "select * from artists where genre='$genre'";
+	// } elseif ($genre) {
+	// 	$sql = "select * from artists where genre='$genre'";
 
-		$stmt = oci_parse($conn, $sql);
-		oci_execute($stmt);
+	// 	$stmt = oci_parse($conn, $sql);
+	// 	oci_execute($stmt);
 
-		$err = oci_error($stmt);
-		if ($err) {
-			echo $err;
-		}
+	// 	$err = oci_error($stmt);
+	// 	if ($err) {
+	// 		echo $err;
+	// 	}
 
-		$artists = array();
+	// 	$artists = array();
 
-		while ($res = oci_fetch_row($stmt))                                                        
-		{
-			$artists[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
-		}  
+	// 	while ($res = oci_fetch_row($stmt))                                                        
+	// 	{
+	// 		$artists[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+	// 	}  
 	} else {
 		$sql = "select * from artists";
 
@@ -133,6 +152,7 @@
 						<li class="active"><a href="/~sks2187/w4111/index.php">Home</a></li>
 						<li><a href="/~sks2187/w4111/artist.php">Artists</a></li>
 						<li><a href="/~sks2187/w4111/concert.php">Concerts</a></li>
+						<li><a href="/~sks2187/w4111/venue.php">Venues</a></li>
 					</ul>
 					<ul class="nav navbar-nav pull-right">
 						<li><?php

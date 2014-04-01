@@ -55,6 +55,7 @@
 						<li class="active"><a href="/~sks2187/w4111/index.php">Home</a></li>
 						<li><a href="/~sks2187/w4111/artist.php">Artists</a></li>
 						<li><a href="/~sks2187/w4111/concert.php">Concerts</a></li>
+						<li><a href="/~sks2187/w4111/venue.php">Venues</a></li>
 					</ul>
 					<ul class="nav navbar-nav pull-right">
 						<li><a href="#login">Login</a></li>
