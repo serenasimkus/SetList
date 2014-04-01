@@ -7,7 +7,7 @@ $stmt = oci_parse($conn, "select * from artists");
 oci_execute($stmt, OCI_DEFAULT);
 while ($res = oci_fetch_row($stmt))                                                        
 {
-	$artist[] = "Artist Name: ". $res[1] ."<br>" ;
+	$artist[] = "<a href='artist.php/?id='".$res[0]."'></a>";
 }  
 oci_close($conn);
 ?>
@@ -38,7 +38,7 @@ oci_close($conn);
 					</ul>
 					<ul class="nav navbar-nav pull-right">
 						<li><?php
-							if($_SESSION['User']) {
+							if ($_SESSION['User']) {
 								echo('<li><a href="#">Welcome, '.$_SESSION['User'].'</a></li>');
 								echo('<li><a href="logout.php">Log Out</a></li>');
 							} else {

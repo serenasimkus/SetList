@@ -54,6 +54,7 @@
 
 		} else if ($username) {
 			echo "Sign up failed because the user login already exists. Please try again.";
+			header('Location: index.php');
 		}
 	}
 	//oci_commit($conn);
