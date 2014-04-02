@@ -2,127 +2,121 @@
 	session_start();
 	ini_set('display_errors', 'On');
 	require_once "connection.php";
+	
+	$artist_info = array();
+	$artists = array();
+
 	if (isset($_GET['id'])) {
 		$id = $_GET['id'];
+		$artist_info = searchByID($conn, $id);
 	} else {
 		$id = false;
+		$artists = otherwise($conn);
 	}
 
 	if (isset($_GET['artist_name'])) {
 		$artist_name = $_GET['artist_name'];
+		$artist_info = searchByArtistName($conn, $artist_name);
 	} else {
 		$artist_name = false;
+		$artists = otherwise($conn);
 	}
 
 	if (isset($_GET['genre'])) {
 		$genre = urldecode($_GET['genre']);
-		searchByGenre($conn, $genre);
+		if (strlen($genre) > 0) {
+			$artists = searchByGenre($conn, $genre);
+		} else {
+			$artists = otherwise($conn);
+		}
 	} else {
 		$genre = false;
+		$artists = otherwise($conn);
 	}
 
-	$sql = "select genre from artists";
+	$options = getGenres($conn, $genre);
 
-	$stmt = oci_parse($conn, $sql);
+	function performQuery($conn, $sql) {
+		$stmt = oci_parse($conn, $sql);
+		oci_execute($stmt);
 
-	oci_execute($stmt);
-
-	$options = array();
-
-	while ($res = oci_fetch_row($stmt))                                                        
-	{
-		if ($genre == $res[0]) {
-			$options[] = "<option selected value=".urlencode($res[0]).">".$res[0]."</option>";
-		} else {
-			$options[] = "<option value=".urlencode($res[0]).">".$res[0]."</option>";
+		$err = oci_error($stmt);
+		if ($err) {
+			echo $err;
 		}
+
+		return $stmt;
 	}
 
-	$options = array_unique($options);
+	function getGenres($conn, $genre) {
+		$sql = "select genre from artists";
+
+		$stmt = performQuery($conn, $sql);
+
+		while ($res = oci_fetch_row($stmt))                                                        
+		{
+			if ($genre == $res[0]) {
+				$options[] = "<option selected value=".urlencode($res[0]).">".$res[0]."</option>";
+			} else {
+				$options[] = "<option value=".urlencode($res[0]).">".$res[0]."</option>";
+			}
+		}
+
+		$options = array_unique($options);
+
+		return $options;
+	}
+
+	function searchByID($conn, $id) {
+		$sql = "select * from artists where artist_id='$id'";
+
+		$stmt = performQuery($conn, $sql);
+
+		while ($res = oci_fetch_assoc($stmt))
+		{
+			$artist_info[] = $res;
+		}
+
+		return $artist_info;
+	}
+
+	function searchByArtistName($conn, $artist_name) {
+		$sql = "select * from artists where artist_name='$artist_name'";
+
+		$stmt = performQuery($conn, $sql);
+
+		while ($res = oci_fetch_assoc($stmt))                                                        
+		{
+			$artist_info[] = $res;
+		}
+
+		return $artist_info;
+	}
 
 	function searchByGenre($conn, $genre) {
 		$sql = "select * from artists where genre='$genre'";
 
-		$stmt = oci_parse($conn, $sql);
-		oci_execute($stmt);
-
-		$err = oci_error($stmt);
-		if ($err) {
-			echo $err;
-		}
-
-		$artists = array();
+		$stmt = performQuery($conn, $sql);
 
 		while ($res = oci_fetch_row($stmt))                                                        
 		{
 			$artists[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
-		} 
+		}
+
+		return $artists;
 	}
 
-	if ($id) {
-		$sql = "select * from artists where artist_id='$id'";
-
-		$stmt = oci_parse($conn, $sql);
-		oci_execute($stmt);
-
-		$err = oci_error($stmt);
-		if ($err) {
-			echo $err;
-		}
-
-		$artist_info = array();
-
-		while ($res = oci_fetch_assoc($stmt))                                                        
-		{
-			$artist_info[] = $res;
-		}  
-	} elseif ($artist_name) {
-		$sql = "select * from artists where artist_name='$artist_name'";
-
-		$stmt = oci_parse($conn, $sql);
-		oci_execute($stmt);
-
-		$err = oci_error($stmt);
-		if ($err) {
-			echo $err;
-		}
-
-		$artist_info = array();
-
-		while ($res = oci_fetch_assoc($stmt))                                                        
-		{
-			$artist_info[] = $res;
-		}  
-	// } elseif ($genre) {
-	// 	$sql = "select * from artists where genre='$genre'";
-
-	// 	$stmt = oci_parse($conn, $sql);
-	// 	oci_execute($stmt);
-
-	// 	$err = oci_error($stmt);
-	// 	if ($err) {
-	// 		echo $err;
-	// 	}
-
-	// 	$artists = array();
-
-	// 	while ($res = oci_fetch_row($stmt))                                                        
-	// 	{
-	// 		$artists[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
-	// 	}  
-	} else {
+	function otherwise($conn) {
 		$sql = "select * from artists";
 
-		$stmt = oci_parse($conn, $sql);
-
-		oci_execute($stmt);
-
-		$artists = array();
+		$stmt = performQuery($conn, $sql);
 
 		while ($res = oci_fetch_row($stmt))                                                        
 		{
 			$artists[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
 		}
+
+		return $artists;
 	}
 
 	oci_close($conn);
@@ -179,7 +173,7 @@
 				<div class="col-md-6">
 					<form method="GET" action="">
 						<select name="genre" onchange="this.form.submit();">
-
+							<option value="" default>Select Genre</option>
 							<?php
 								foreach($options as $a) {
 									echo $a;
@@ -191,7 +185,7 @@
 			</div>
 
 			<?php
-				if (isset($artist_info)) {
+				if (count($artist_info) > 0) {
 					echo ("<h3>Artist name: ".$artist_info[0]['ARTIST_NAME']."</h3>");
 					echo ("<h4>Genre: ".$artist_info[0]['GENRE']."</h4>");
 					echo ("<p>Bio: ".$artist_info[0]['BIO']."<p>");
