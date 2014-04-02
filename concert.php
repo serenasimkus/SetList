@@ -2,10 +2,9 @@
 	session_start();
 	ini_set('display_errors', 'On');
 	require_once "connection.php";
-	echo "HEY";
+
 	$concert_info = array();
 	$concerts = array();
-		echo "hey";
 
 	if (isset($_GET['id'])) {
 		$id = $_GET['id'];
@@ -35,8 +34,6 @@
 		$concerts = otherwise($conn);
 	}
 
-	//$options = getGenres($conn, $concert_date);
-
 	function performQuery($conn, $sql) {
 		$stmt = oci_parse($conn, $sql);
 		oci_execute($stmt);
@@ -48,25 +45,6 @@
 
 		return $stmt;
 	}
-
-	// function getGenres($conn, $concert_date) {
-	// 	$sql = "select concert_date from concerts";
-
-	// 	$stmt = performQuery($conn, $sql);
-
-	// 	while ($res = oci_fetch_row($stmt))                                                        
-	// 	{
-	// 		if ($concert_date == $res[0]) {
-	// 			$options[] = "<option selected value=".urlencode($res[0]).">".$res[0]."</option>";
-	// 		} else {
-	// 			$options[] = "<option value=".urlencode($res[0]).">".$res[0]."</option>";
-	// 		}
-	// 	}
-
-	// 	$options = array_unique($options);
-
-	// 	return $options;
-	// }
 
 	function searchByID($conn, $id) {
 		$sql = "select * from concerts where concert_id='$id'";
@@ -173,15 +151,7 @@
 				</div>
 				<div class="col-md-6">
 					<form method="GET" action="">
-<!-- 						<select name="genre" onchange="this.form.submit();">
-							<option value="" default>Select Genre</option>
-							<?php
-								//foreach($options as $a) {
-									//echo $a;
-								}
-							?>
-						</select> -->
-						<input type="text" placeholder="Concert name" class="form-control" name="concert_name"/>
+						<input type="text" placeholder="Concert date" class="form-control" name="concert_date"/>
 					</form>
 				</div>
 			</div>
@@ -195,7 +165,6 @@
 					// add more here 
 					//echo ("<p>Reviews: ".$concert_info[0]['GENRE']."<p>");
 				} else {
-					echo "hEy";
 					foreach($concerts as $a) {
 						echo $a;
 					}
