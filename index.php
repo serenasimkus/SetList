@@ -41,7 +41,7 @@
 					</ul>
 					<ul class="nav navbar-nav pull-right">
 						<li><?php
-							if (count($_SESSION['User']) != 0) {
+							if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
 								echo('<li><a href="#">Welcome, '.$_SESSION['User'].'</a></li>');
 								echo('<li><a href="logout.php">Log Out</a></li>');
 							} else {

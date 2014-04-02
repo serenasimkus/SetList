@@ -14,10 +14,7 @@
 			$gender = $_POST['gender'];
 		}
 
-		// $_SESSION['name'] = $username;
-		// $_SESSION['password'] = $password;
-		// $_SESSION['birthdate'] = $birthdate;
-		// $_SESSION['gender'] = $gender;
+		echo $username;
 
 		$sql = "select * from users where username='$username'";
 
@@ -53,11 +50,10 @@
 			}  
 
 		} else if ($username) {
-			echo "Sign up failed because the user login already exists. Please try again.";
-			header('Location: index.php');
+			$_SESSION['Error'] = "Sign up failed because the user login already exists. Please try again.";
+			header('Location: login.php');
 		}
 	}
-	//oci_commit($conn);
 
 	oci_close($conn);
 ?>

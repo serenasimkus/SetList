@@ -8,9 +8,6 @@
 		$username = $_POST['username'];
 		$password = $_POST['password'];
 
-		$_SESSION['name'] = $username;
-		$_SESSION['password'] = $password;
-
 		$sql = "select * from users where username='$username' and password='$password'";
 
 		$stmt = oci_parse($conn, $sql);
@@ -59,7 +56,7 @@
 						<li><a href="/~sks2187/w4111/venue.php">Venues</a></li>
 					</ul>
 					<ul class="nav navbar-nav pull-right">
-						<li><a href="#login">Login</a></li>
+						<li><a href="/~sks2187/w4111/login.php">Login</a></li>
 					</ul>
 				</div><!--/.nav-collapse -->
 			</div>
@@ -82,24 +79,15 @@
 						<div class="panel-body">
 							<form class="form-horizontal" role="form" method="POST" action="">
 							  <div class="form-group">
-							    <label for="inputEmail3" class="col-sm-2 control-label">Username</label>
+							    <label for="inputUsername" class="col-sm-2 control-label">Username</label>
 							    <div class="col-sm-10">
-							      <input type="text" class="form-control" id="inputEmail3" placeholder="Username" name="username">
+							      <input type="text" class="form-control" id="inputUsername" placeholder="Username" name="username">
 							    </div>
 							  </div>
 							  <div class="form-group">
-							    <label for="inputPassword3" class="col-sm-2 control-label">Password</label>
+							    <label for="inputPassword" class="col-sm-2 control-label">Password</label>
 							    <div class="col-sm-10">
-							      <input type="password" class="form-control" id="inputPassword3" placeholder="Password" name="password">
-							    </div>
-							  </div>
-							  <div class="form-group">
-							    <div class="col-sm-offset-2 col-sm-10">
-							      <div class="checkbox">
-							        <label>
-							          <input type="checkbox"> Remember me
-							        </label>
-							      </div>
+							      <input type="password" class="form-control" id="inputPassword" placeholder="Password" name="password">
 							    </div>
 							  </div>
 							  <div class="form-group">
@@ -119,27 +107,27 @@
 						<div class="panel-body">
 							<form class="form-horizontal" role="form" method="POST" action="register.php">
 							  <div class="form-group">
-							    <label for="inputEmail3" class="col-sm-2 control-label">Username</label>
+							    <label for="inputUsername2" class="col-sm-2 control-label">Username</label>
 							    <div class="col-sm-10">
-							      <input type="text" class="form-control" id="inputEmail3" placeholder="Username">
+							      <input type="text" class="form-control" id="inputUsername2" placeholder="Username" name="username">
 							    </div>
 							  </div>
 							  <div class="form-group">
-							    <label for="inputPassword3" class="col-sm-2 control-label">Password</label>
+							    <label for="inputPassword2" class="col-sm-2 control-label">Password</label>
 							    <div class="col-sm-10">
-							      <input type="password" class="form-control" id="inputPassword3" placeholder="Password">
+							      <input type="password" class="form-control" id="inputPassword2" placeholder="Password" name="password">
 							    </div>
 							  </div>
 							  <div class="form-group">
-							    <label for="inputPassword3" class="col-sm-2 control-label">Birthdate</label>
+							    <label for="inputBirthdate" class="col-sm-2 control-label">Birthdate</label>
 							    <div class="col-sm-10">
-							      <input type="text" class="form-control" id="inputPassword3" placeholder="Birthdate">
+							      <input type="text" class="form-control" id="inputBirthdate" placeholder="DD-MON-YYYY" name="birthdate">
 							    </div>
 							  </div>
 							  <div class="form-group">
-							    <label for="inputPassword3" class="col-sm-2 control-label">Gender</label>
+							    <label for="inputGender" class="col-sm-2 control-label">Gender</label>
 							    <div class="col-sm-10">
-							      <input type="text" class="form-control" id="inputPassword3" placeholder="Gender">
+							      <input type="text" class="form-control" id="inputGender" placeholder="Gender" name="gender">
 							    </div>
 							  </div>
 							  <div class="form-group">

@@ -2,24 +2,123 @@
 	session_start();
 	ini_set('display_errors', 'On');
 	require_once "connection.php";
-	$id = $_GET['id'];
+	
+	$artist_info = array();
+	$artists = array();
 
-	$sql = "select * from concerts where concert_id='$id'";
-
-	$stmt = oci_parse($conn, $sql);
-	oci_execute($stmt);
-
-	$err = oci_error($stmt);
-	if ($err) {
-		echo $err;
+	if (isset($_GET['id'])) {
+		$id = $_GET['id'];
+		$artist_info = searchByID($conn, $id);
+	} else {
+		$id = false;
+		$artists = otherwise($conn);
 	}
 
-	$concert_info = array();
+	if (isset($_GET['artist_name'])) {
+		$artist_name = $_GET['artist_name'];
+		$artist_info = searchByArtistName($conn, $artist_name);
+	} else {
+		$artist_name = false;
+		$artists = otherwise($conn);
+	}
 
-	while ($res = oci_fetch_assoc($stmt))                                                        
-	{
-		$concert_info[] = $res;
-	}  
+	if (isset($_GET['genre'])) {
+		$genre = urldecode($_GET['genre']);
+		if (strlen($genre) > 0) {
+			$artists = searchByGenre($conn, $genre);
+		} else {
+			$artists = otherwise($conn);
+		}
+	} else {
+		$genre = false;
+		$artists = otherwise($conn);
+	}
+
+	$options = getGenres($conn, $genre);
+
+	function performQuery($conn, $sql) {
+		$stmt = oci_parse($conn, $sql);
+		oci_execute($stmt);
+
+		$err = oci_error($stmt);
+		if ($err) {
+			echo $err;
+		}
+
+		return $stmt;
+	}
+
+	function getGenres($conn, $genre) {
+		$sql = "select genre from artists";
+
+		$stmt = performQuery($conn, $sql);
+
+		while ($res = oci_fetch_row($stmt))                                                        
+		{
+			if ($genre == $res[0]) {
+				$options[] = "<option selected value=".urlencode($res[0]).">".$res[0]."</option>";
+			} else {
+				$options[] = "<option value=".urlencode($res[0]).">".$res[0]."</option>";
+			}
+		}
+
+		$options = array_unique($options);
+
+		return $options;
+	}
+
+	function searchByID($conn, $id) {
+		$sql = "select * from artists where artist_id='$id'";
+
+		$stmt = performQuery($conn, $sql);
+
+		while ($res = oci_fetch_assoc($stmt))
+		{
+			$artist_info[] = $res;
+		}
+
+		return $artist_info;
+	}
+
+	function searchByArtistName($conn, $artist_name) {
+		$sql = "select * from artists where artist_name='$artist_name'";
+
+		$stmt = performQuery($conn, $sql);
+
+		while ($res = oci_fetch_assoc($stmt))                                                        
+		{
+			$artist_info[] = $res;
+		}
+
+		return $artist_info;
+	}
+
+	function searchByGenre($conn, $genre) {
+		$sql = "select * from artists where genre='$genre'";
+
+		$stmt = performQuery($conn, $sql);
+
+		while ($res = oci_fetch_row($stmt))                                                        
+		{
+			$artists[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+		}
+
+		return $artists;
+	}
+
+	function otherwise($conn) {
+		$sql = "select * from artists";
+
+		$stmt = performQuery($conn, $sql);
+
+		while ($res = oci_fetch_row($stmt))                                                        
+		{
+			$artists[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+		}
+
+		return $artists;
+	}
+
 	oci_close($conn);
 ?>
 
@@ -45,11 +144,13 @@
 				<div class="collapse navbar-collapse">
 					<ul class="nav navbar-nav">
 						<li class="active"><a href="/~sks2187/w4111/index.php">Home</a></li>
-						<li><a href="#contact">Contact</a></li>
+						<li><a href="/~sks2187/w4111/artist.php">Artists</a></li>
+						<li><a href="/~sks2187/w4111/concert.php">Concerts</a></li>
+						<li><a href="/~sks2187/w4111/venue.php">Venues</a></li>
 					</ul>
 					<ul class="nav navbar-nav pull-right">
 						<li><?php
-							if (count($_SESSION['User']) != 0) {
+							if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
 								echo('<li><a href="#">Welcome, '.$_SESSION['User'].'</a></li>');
 								echo('<li><a href="logout.php">Log Out</a></li>');
 							} else {
@@ -63,10 +164,36 @@
 		
 		<div class="container">
 			<h3>Welcome to SetList!</h3>
+			<div class="row">
+				<div class="col-md-6">
+					<form method="GET" action="">
+						<input type="text" placeholder="Artist name" class="form-control" name="artist_name"/>
+					</form>
+				</div>
+				<div class="col-md-6">
+					<form method="GET" action="">
+						<select name="genre" onchange="this.form.submit();">
+							<option value="" default>Select Genre</option>
+							<?php
+								foreach($options as $a) {
+									echo $a;
+								}
+							?>
+						</select>
+					</form>
+				</div>
+			</div>
+
 			<?php
-				echo ("<h3>Concert name: ".$concert_info[0]['NAME']."</h3>");
-				echo ("<h4>Date: ".$concert_info[0]['CONCERT_DATE']."</h4>");
-				echo ("<p>Start time: ".$concert_info[0]['START_TIME']."<p>");
+				if (count($artist_info) > 0) {
+					echo ("<h3>Artist name: ".$artist_info[0]['ARTIST_NAME']."</h3>");
+					echo ("<h4>Genre: ".$artist_info[0]['GENRE']."</h4>");
+					echo ("<p>Bio: ".$artist_info[0]['BIO']."<p>");
+				} else {
+					foreach($artists as $a) {
+						echo $a;
+					}
+				}
 			?>
 		</div>
 	</body>
