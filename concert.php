@@ -3,38 +3,39 @@
 	ini_set('display_errors', 'On');
 	require_once "connection.php";
 	
-	$artist_info = array();
-	$artists = array();
+	$concert_info = array();
+	$concerts = array();
+		echo "hey";
 
 	if (isset($_GET['id'])) {
 		$id = $_GET['id'];
-		$artist_info = searchByID($conn, $id);
+		$concert_info = searchByID($conn, $id);
 	} else {
 		$id = false;
-		$artists = otherwise($conn);
+		$concerts = otherwise($conn);
 	}
 
-	if (isset($_GET['artist_name'])) {
-		$artist_name = $_GET['artist_name'];
-		$artist_info = searchByArtistName($conn, $artist_name);
+	if (isset($_GET['concert_name'])) {
+		$concert_name = $_GET['concert_name'];
+		$concert_info = searchByConcertName($conn, $concert_name);
 	} else {
-		$artist_name = false;
-		$artists = otherwise($conn);
+		$concert_name = false;
+		$concerts = otherwise($conn);
 	}
 
-	if (isset($_GET['genre'])) {
-		$genre = urldecode($_GET['genre']);
-		if (strlen($genre) > 0) {
-			$artists = searchByGenre($conn, $genre);
+	if (isset($_GET['concert_date'])) {
+		$concert_date = urldecode($_GET['concert_date']);
+		if (strlen($concert_date) > 0) {
+			$concerts = searchByDate($conn, $concert_date);
 		} else {
-			$artists = otherwise($conn);
+			$concerts = otherwise($conn);
 		}
 	} else {
-		$genre = false;
-		$artists = otherwise($conn);
+		$concert_date = false;
+		$concerts = otherwise($conn);
 	}
 
-	$options = getGenres($conn, $genre);
+	//$options = getGenres($conn, $concert_date);
 
 	function performQuery($conn, $sql) {
 		$stmt = oci_parse($conn, $sql);
@@ -48,75 +49,75 @@
 		return $stmt;
 	}
 
-	function getGenres($conn, $genre) {
-		$sql = "select genre from artists";
+	// function getGenres($conn, $concert_date) {
+	// 	$sql = "select concert_date from concerts";
 
-		$stmt = performQuery($conn, $sql);
+	// 	$stmt = performQuery($conn, $sql);
 
-		while ($res = oci_fetch_row($stmt))                                                        
-		{
-			if ($genre == $res[0]) {
-				$options[] = "<option selected value=".urlencode($res[0]).">".$res[0]."</option>";
-			} else {
-				$options[] = "<option value=".urlencode($res[0]).">".$res[0]."</option>";
-			}
-		}
+	// 	while ($res = oci_fetch_row($stmt))                                                        
+	// 	{
+	// 		if ($concert_date == $res[0]) {
+	// 			$options[] = "<option selected value=".urlencode($res[0]).">".$res[0]."</option>";
+	// 		} else {
+	// 			$options[] = "<option value=".urlencode($res[0]).">".$res[0]."</option>";
+	// 		}
+	// 	}
 
-		$options = array_unique($options);
+	// 	$options = array_unique($options);
 
-		return $options;
-	}
+	// 	return $options;
+	// }
 
 	function searchByID($conn, $id) {
-		$sql = "select * from artists where artist_id='$id'";
+		$sql = "select * from concerts where concert_id='$id'";
 
 		$stmt = performQuery($conn, $sql);
 
 		while ($res = oci_fetch_assoc($stmt))
 		{
-			$artist_info[] = $res;
+			$concert_info[] = $res;
 		}
 
-		return $artist_info;
+		return $concert_info;
 	}
 
-	function searchByArtistName($conn, $artist_name) {
-		$sql = "select * from artists where artist_name='$artist_name'";
+	function searchByConcertName($conn, $concert_name) {
+		$sql = "select * from concerts where name='$concert_name'";
 
 		$stmt = performQuery($conn, $sql);
 
 		while ($res = oci_fetch_assoc($stmt))                                                        
 		{
-			$artist_info[] = $res;
+			$concert_info[] = $res;
 		}
 
-		return $artist_info;
+		return $concert_info;
 	}
 
-	function searchByGenre($conn, $genre) {
-		$sql = "select * from artists where genre='$genre'";
+	function searchByDate($conn, $concert_date) {
+		$sql = "select * from concerts where concert_date='$concert_date'";
 
 		$stmt = performQuery($conn, $sql);
 
 		while ($res = oci_fetch_row($stmt))                                                        
 		{
-			$artists[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+			$concerts[] = "<li><a href='concert.php/?id=".$res[0]."'>".$res[1]."</a></li>";
 		}
 
-		return $artists;
+		return $concerts;
 	}
 
 	function otherwise($conn) {
-		$sql = "select * from artists";
+		$sql = "select * from concerts";
 
 		$stmt = performQuery($conn, $sql);
 
 		while ($res = oci_fetch_row($stmt))                                                        
 		{
-			$artists[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+			$concerts[] = "<li><a href='concert.php/?id=".$res[0]."'>".$res[1]."</a></li>";
 		}
 
-		return $artists;
+		return $concerts;
 	}
 
 	oci_close($conn);
@@ -167,30 +168,34 @@
 			<div class="row">
 				<div class="col-md-6">
 					<form method="GET" action="">
-						<input type="text" placeholder="Artist name" class="form-control" name="artist_name"/>
+						<input type="text" placeholder="Concert name" class="form-control" name="concert_name"/>
 					</form>
 				</div>
 				<div class="col-md-6">
 					<form method="GET" action="">
-						<select name="genre" onchange="this.form.submit();">
+<!-- 						<select name="genre" onchange="this.form.submit();">
 							<option value="" default>Select Genre</option>
 							<?php
-								foreach($options as $a) {
-									echo $a;
+								//foreach($options as $a) {
+									//echo $a;
 								}
 							?>
-						</select>
+						</select> -->
+						<input type="text" placeholder="Concert name" class="form-control" name="concert_name"/>
 					</form>
 				</div>
 			</div>
 
 			<?php
-				if (count($artist_info) > 0) {
-					echo ("<h3>Artist name: ".$artist_info[0]['ARTIST_NAME']."</h3>");
-					echo ("<h4>Genre: ".$artist_info[0]['GENRE']."</h4>");
-					echo ("<p>Bio: ".$artist_info[0]['BIO']."<p>");
+				if (count($concert_info) > 0) {
+					echo ("<h3>Concert name: ".$concert_info[0]['NAME']."</h3>");
+					echo ("<h4>Date: ".$concert_info[0]['CONCERT_DATE']."</h4>");
+					echo ("<h5>Start time: ".$concert_info[0]['START_TIME']."</h5>");
+					//echo ("<h4>Venue: ".$concert_info[0]['GENRE']."</h4>");
+					// add more here 
+					//echo ("<p>Reviews: ".$concert_info[0]['GENRE']."<p>");
 				} else {
-					foreach($artists as $a) {
+					foreach($concerts as $a) {
 						echo $a;
 					}
 				}
