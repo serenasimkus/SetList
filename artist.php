@@ -139,8 +139,8 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-				<a class="navbar-brand" href="/~sks2187/w4111/index.php">SetList</a>
-			</div>
+					<a class="navbar-brand" href="/~sks2187/w4111/index.php">SetList</a>
+				</div>
 				<div class="collapse navbar-collapse">
 					<ul class="nav navbar-nav">
 						<li class="active"><a href="/~sks2187/w4111/index.php">Home</a></li>
@@ -183,7 +183,7 @@
 					</form>
 				</div>
 			</div>
-
+			
 			<?php
 				if (count($artist_info) > 0) {
 					echo ("<h3>Artist name: ".$artist_info[0]['ARTIST_NAME']."</h3>");

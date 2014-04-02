@@ -2,7 +2,7 @@
 	session_start();
 	ini_set('display_errors', 'On');
 	require_once "connection.php";
-	
+	echo "HEY";
 	$concert_info = array();
 	$concerts = array();
 		echo "hey";
@@ -140,8 +140,8 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-				<a class="navbar-brand" href="/~sks2187/w4111/index.php">SetList</a>
-			</div>
+					<a class="navbar-brand" href="/~sks2187/w4111/index.php">SetList</a>
+				</div>
 				<div class="collapse navbar-collapse">
 					<ul class="nav navbar-nav">
 						<li class="active"><a href="/~sks2187/w4111/index.php">Home</a></li>
@@ -195,6 +195,7 @@
 					// add more here 
 					//echo ("<p>Reviews: ".$concert_info[0]['GENRE']."<p>");
 				} else {
+					echo "hEy";
 					foreach($concerts as $a) {
 						echo $a;
 					}
