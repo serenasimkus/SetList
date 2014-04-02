@@ -25,7 +25,8 @@
 		{
 			$_SESSION['User'] = $res[0];
 			header('Location: index.php');
-		}  
+		}
+		$_SESSION['Error'] = "Login failed";
 	}
 
 	oci_close($conn);
@@ -64,6 +65,13 @@
 			</div>
 		</div>
 		
+		<?php
+			if (isset($_SESSION['Error']) && !empty($_SESSION['Error'])) {
+				echo '<div class="alert alert-success">'.$_SESSION['Error'].'</div>';
+				$_SESSION['Error'] = "";
+			}
+		?>
+
 		<div class="container">
 			<div class="row">
 				<div class="col-md-6">
