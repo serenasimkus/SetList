@@ -78,6 +78,7 @@
 		}
 
 		$artist_info['SONGS'][] = getArtistSongs($conn, $id);
+		$artist_info['CONCERTS'][] = getArtistConcerts($conn, $id);
 
 		return $artist_info;
 	}
@@ -92,7 +93,8 @@
 			$artist_info[] = $res;
 		}
 
-		$artist_info['SONGS'][] = getArtistSongs($conn, $id);
+		$artist_info['SONGS'][] = getArtistSongs($conn, $artist_info[0]['ARTIST_ID']);
+		$artist_info['CONCERTS'][] = getArtistConcerts($conn, $artist_info[0]['ARTIST_ID']);
 
 		return $artist_info;
 	}
@@ -108,6 +110,21 @@
 		}
 
 		return $artists;
+	}
+
+	function getArtistConcerts($conn, $id) {
+		$sql = "select * from concerts c, performs p where c.concert_id=p.concert_id and p.artist_id='$id'";
+
+		$stmt = performQuery($conn, $sql);
+
+		$artist_info = "";
+
+		while ($res = oci_fetch_row($stmt))                                                        
+		{
+			$artist_info[] = "<li><a href='/~sks2187/w4111/concert.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+		}
+
+		return $artist_info;
 	}
 
 	function getArtistSongs($conn, $id) {
@@ -208,7 +225,12 @@
 					echo ("<h3>Artist name: ".$artist_info[0]['ARTIST_NAME']."</h3>");
 					echo ("<h4>Genre: ".$artist_info[0]['GENRE']."</h4>");
 					echo ("<p>Bio: ".$artist_info[0]['BIO']."<p>");
-
+					echo ("<h4>Concerts: </h4>");
+					echo ("<ul>");
+					foreach ($artist_info['CONCERTS'][0] as $x) {
+						echo $x;
+					}
+					echo ("</ul>");
 					echo ("<h4>Songs: </h4>");
 					echo ("<ul>");
 					foreach ($artist_info['SONGS'][0] as $x) {

@@ -69,7 +69,7 @@
 
 		$stmt = performQuery($conn, $sql);
 
-		while ($res = oci_fetch_assoc($stmt))                                                        
+		while ($res = oci_fetch_assoc($stmt))
 		{
 			$concert_info[] = $res;
 		}
@@ -84,7 +84,7 @@
 
 		$concerts = "";
 		
-		while ($res = oci_fetch_row($stmt))                                                        
+		while ($res = oci_fetch_row($stmt))
 		{
 			$concerts[] = "<li><a href='/~sks2187/w4111/concert.php/?id=".$res[0]."'>".$res[1]."</a></li>";
 		}
