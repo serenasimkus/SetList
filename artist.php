@@ -92,6 +92,8 @@
 			$artist_info[] = $res;
 		}
 
+		$artist_info['SONGS'][] = getArtistSongs($conn, $id);
+
 		return $artist_info;
 	}
 
