@@ -86,7 +86,7 @@
 			</div>
 				<div class="collapse navbar-collapse">
 					<ul class="nav navbar-nav">
-						<li class="active"><a href="/~sks2187/w4111/index.php">Home</a></li>
+						<li><a href="/~sks2187/w4111/index.php">Home</a></li>
 						<li><a href="/~sks2187/w4111/artist.php">Artists</a></li>
 						<li><a href="/~sks2187/w4111/concert.php">Concerts</a></li>
 						<li><a href="/~sks2187/w4111/venue.php">Venues</a></li>
@@ -94,7 +94,7 @@
 					<ul class="nav navbar-nav pull-right">
 						<li><?php
 							if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
-								echo('<li><a href="/~sks2187/w4111/user.php">Welcome, '.$_SESSION['User']['USERNAME'].'</a></li>');
+								echo('<li class="active"><a href="/~sks2187/w4111/user.php">Welcome, '.$_SESSION['User']['USERNAME'].'</a></li>');
 								echo('<li><a href="/~sks2187/w4111/logout.php">Log Out</a></li>');
 							} else {
 								echo('<li><a href="/~sks2187/w4111/login.php">Log In</a></li>');

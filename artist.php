@@ -77,6 +77,8 @@
 			$artist_info[] = $res;
 		}
 
+		$artist_info['SONGS'][] = getArtistSongs($conn, $id);
+
 		return $artist_info;
 	}
 
@@ -100,10 +102,25 @@
 
 		while ($res = oci_fetch_row($stmt))                                                        
 		{
-			$artists[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+			$artists[] = "<li><a href='/~sks2187/w4111/artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
 		}
 
 		return $artists;
+	}
+
+	function getArtistSongs($conn, $id) {
+		$sql = "select * from songs s, created_by c where s.song_id=c.song_id and c.artist_id='$id'";
+
+		$stmt = performQuery($conn, $sql);
+
+		$artist_info = "";
+
+		while ($res = oci_fetch_row($stmt))                                                        
+		{
+			$artist_info[] = "<li><a href='/~sks2187/w4111/song.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+		}
+
+		return $artist_info;
 	}
 
 	function otherwise($conn) {
@@ -113,7 +130,7 @@
 
 		while ($res = oci_fetch_row($stmt))                                                        
 		{
-			$artists[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+			$artists[] = "<li><a href='/~sks2187/w4111/artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
 		}
 
 		return $artists;
@@ -143,8 +160,8 @@
 				</div>
 				<div class="collapse navbar-collapse">
 					<ul class="nav navbar-nav">
-						<li class="active"><a href="/~sks2187/w4111/index.php">Home</a></li>
-						<li><a href="/~sks2187/w4111/artist.php">Artists</a></li>
+						<li><a href="/~sks2187/w4111/index.php">Home</a></li>
+						<li class="active"><a href="/~sks2187/w4111/artist.php">Artists</a></li>
 						<li><a href="/~sks2187/w4111/concert.php">Concerts</a></li>
 						<li><a href="/~sks2187/w4111/venue.php">Venues</a></li>
 					</ul>
@@ -172,7 +189,7 @@
 				</div>
 				<div class="col-md-6">
 					<form method="GET" action="">
-						<select name="genre" onchange="this.form.submit();">
+						<select class="form-control" name="genre" onchange="this.form.submit();">
 							<option value="" default>Select Genre</option>
 							<?php
 								foreach($options as $a) {
@@ -189,8 +206,15 @@
 					echo ("<h3>Artist name: ".$artist_info[0]['ARTIST_NAME']."</h3>");
 					echo ("<h4>Genre: ".$artist_info[0]['GENRE']."</h4>");
 					echo ("<p>Bio: ".$artist_info[0]['BIO']."<p>");
+
+					echo ("<h4>Songs: </h4>");
+					echo ("<ul>");
+					foreach ($artist_info['SONGS'][0] as $x) {
+						echo $x;
+					}
+					echo ("</ul>");
 				} else {
-					foreach($artists as $a) {
+					foreach ($artists as $a) {
 						echo $a;
 					}
 				}

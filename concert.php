@@ -82,9 +82,11 @@
 
 		$stmt = performQuery($conn, $sql);
 
+		$concerts = "";
+		
 		while ($res = oci_fetch_row($stmt))                                                        
 		{
-			$concerts[] = "<li><a href='concert.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+			$concerts[] = "<li><a href='/~sks2187/w4111/concert.php/?id=".$res[0]."'>".$res[1]."</a></li>";
 		}
 
 		return $concerts;
@@ -112,7 +114,7 @@
 
 		while ($res = oci_fetch_row($stmt))                                                        
 		{
-			$concerts[] = "<li><a href='concert.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+			$concerts[] = "<li><a href='/~sks2187/w4111/concert.php/?id=".$res[0]."'>".$res[1]."</a></li>";
 		}
 
 		return $concerts;
@@ -151,9 +153,9 @@
 				</div>
 				<div class="collapse navbar-collapse">
 					<ul class="nav navbar-nav">
-						<li class="active"><a href="/~sks2187/w4111/index.php">Home</a></li>
+						<li><a href="/~sks2187/w4111/index.php">Home</a></li>
 						<li><a href="/~sks2187/w4111/artist.php">Artists</a></li>
-						<li><a href="/~sks2187/w4111/concert.php">Concerts</a></li>
+						<li class="active"><a href="/~sks2187/w4111/concert.php">Concerts</a></li>
 						<li><a href="/~sks2187/w4111/venue.php">Venues</a></li>
 					</ul>
 					<ul class="nav navbar-nav pull-right">
@@ -196,8 +198,10 @@
 						echo ("<h5>Reviews: </h5><p>Username: ".$concert_info[1][0]['USERNAME']."<p><p>".$concert_info[1][0]['REVIEW']."<p>");
 					}
 				} else {
-					foreach($concerts as $a) {
-						echo $a;
+					if (isset($concerts) && !empty($concerts)) {
+						foreach($concerts as $a) {
+							echo $a;
+						}
 					}
 				}
 			?>
