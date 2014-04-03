@@ -151,10 +151,10 @@
 					<ul class="nav navbar-nav pull-right">
 						<li><?php
 							if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
-								echo('<li><a href="#">Welcome, '.$_SESSION['User'].'</a></li>');
-								echo('<li><a href="logout.php">Log Out</a></li>');
+								echo('<li><a href="/~sks2187/w4111/user.php">Welcome, '.$_SESSION['User']['USERNAME'].'</a></li>');
+								echo('<li><a href="/~sks2187/w4111/logout.php">Log Out</a></li>');
 							} else {
-								echo('<li><a href="login.php">Log In</a></li>');
+								echo('<li><a href="/~sks2187/w4111/login.php">Log In</a></li>');
 							}
 						?></li>
 					</ul>
@@ -183,7 +183,7 @@
 					</form>
 				</div>
 			</div>
-			
+
 			<?php
 				if (count($artist_info) > 0) {
 					echo ("<h3>Artist name: ".$artist_info[0]['ARTIST_NAME']."</h3>");

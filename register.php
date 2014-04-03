@@ -14,8 +14,6 @@
 			$gender = $_POST['gender'];
 		}
 
-		echo $username;
-
 		$sql = "select * from users where username='$username'";
 
 		$stmt = oci_parse($conn, $sql);
@@ -45,7 +43,7 @@
 
 			while ($res = oci_fetch_row($stmt))
 			{
-				$_SESSION['User'] = $res[0];
+				$_SESSION['User'] = $res;
 				header('Location: index.php');
 			}  
 

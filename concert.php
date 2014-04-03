@@ -4,11 +4,14 @@
 	require_once "connection.php";
 
 	$concert_info = array();
+	//$concert_review = array();
 	$concerts = array();
 
 	if (isset($_GET['id'])) {
 		$id = $_GET['id'];
 		$concert_info = searchByID($conn, $id);
+		$concert_review = searchByConcertReview($conn, $id);
+		$concert_info[] = $concert_review;
 	} else {
 		$id = false;
 		$concerts = otherwise($conn);
@@ -17,6 +20,8 @@
 	if (isset($_GET['concert_name'])) {
 		$concert_name = $_GET['concert_name'];
 		$concert_info = searchByConcertName($conn, $concert_name);
+		$concert_review = searchByConcertReview($conn, $id);
+		$concert_info[] = $concert_review;
 	} else {
 		$concert_name = false;
 		$concerts = otherwise($conn);
@@ -85,6 +90,21 @@
 		return $concerts;
 	}
 
+	function searchByConcertReview($conn, $id) {
+		$sql = "select username, review from reviews_c where concert_id='$id'";
+
+		$stmt = performQuery($conn, $sql);
+
+		$concert_review = array();
+
+		while ($res = oci_fetch_assoc($stmt))
+		{
+			$concert_review[] = $res;
+		}
+
+		return $concert_review;
+	}
+
 	function otherwise($conn) {
 		$sql = "select * from concerts";
 
@@ -106,6 +126,15 @@
 		<title>SetList</title>
 		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="jqueryui/css/ui-lightness/jqueryui.css"/>
+		<script src="jqueryui/js/jquery.js"></script>
+		<script src="jqueryui/js/jqueryui.js"></script>
+		<script>
+			$(function() {
+				$( "#datepicker" ).datepicker();
+				$( "#datepicker" ).datepicker( "option", "dateFormat", "dd-M-yy" );
+			});
+		</script>
 	</head>
 	
 	<body style="margin-top:60px;">
@@ -130,10 +159,10 @@
 					<ul class="nav navbar-nav pull-right">
 						<li><?php
 							if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
-								echo('<li><a href="#">Welcome, '.$_SESSION['User'].'</a></li>');
-								echo('<li><a href="logout.php">Log Out</a></li>');
+								echo('<li><a href="/~sks2187/w4111/user.php">Welcome, '.$_SESSION['User']['USERNAME'].'</a></li>');
+								echo('<li><a href="/~sks2187/w4111/logout.php">Log Out</a></li>');
 							} else {
-								echo('<li><a href="login.php">Log In</a></li>');
+								echo('<li><a href="/~sks2187/w4111/login.php">Log In</a></li>');
 							}
 						?></li>
 					</ul>
@@ -151,7 +180,7 @@
 				</div>
 				<div class="col-md-6">
 					<form method="GET" action="">
-						<input type="text" placeholder="Concert date" class="form-control" name="concert_date"/>
+						<input type="text" id="datepicker" placeholder="Concert date" class="form-control" name="concert_date" onchange="this.form.submit();"/>
 					</form>
 				</div>
 			</div>
@@ -163,7 +192,9 @@
 					echo ("<h5>Start time: ".$concert_info[0]['START_TIME']."</h5>");
 					//echo ("<h4>Venue: ".$concert_info[0]['GENRE']."</h4>");
 					// add more here 
-					//echo ("<p>Reviews: ".$concert_info[0]['GENRE']."<p>");
+					if (count($concert_info[1]) > 0) {
+						echo ("<h5>Reviews: </h5><p>Username: ".$concert_info[1][0]['USERNAME']."<p><p>".$concert_info[1][0]['REVIEW']."<p>");
+					}
 				} else {
 					foreach($concerts as $a) {
 						echo $a;

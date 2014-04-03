@@ -18,9 +18,9 @@
 			echo $err;
 		}
 
-		while ($res = oci_fetch_row($stmt))
+		while ($res = oci_fetch_assoc($stmt))
 		{
-			$_SESSION['User'] = $res[0];
+			$_SESSION['User'] = $res;
 			header('Location: index.php');
 		}
 		$_SESSION['Error'] = "Login failed";
