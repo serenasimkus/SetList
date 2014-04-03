@@ -136,7 +136,7 @@
 
 		while ($res = oci_fetch_row($stmt))                                                        
 		{
-			$artist_info[] = "<li><a href='/~sks2187/w4111/song.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+			$artist_info[] = "<li>".$res[1]."</li>";
 		}
 
 		return $artist_info;

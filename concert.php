@@ -4,7 +4,6 @@
 	require_once "connection.php";
 
 	$concert_info = array();
-	//$concert_review = array();
 	$concerts = array();
 
 	if (isset($_GET['id'])) {
@@ -20,7 +19,7 @@
 	if (isset($_GET['concert_name'])) {
 		$concert_name = $_GET['concert_name'];
 		$concert_info = searchByConcertName($conn, $concert_name);
-		$concert_review = searchByConcertReview($conn, $id);
+		$concert_review = searchByConcertReview($conn, $concert_info[0]['CONCERT_ID']);
 		$concert_info[] = $concert_review;
 	} else {
 		$concert_name = false;
@@ -61,6 +60,9 @@
 			$concert_info[] = $res;
 		}
 
+		$concert_info['VENUE'][] = getConcertVenue($conn, $concert_info[0]['CONCERT_ID']);
+		$concert_info['ARTISTS'][] = getConcertArtists($conn, $concert_info[0]['CONCERT_ID']);
+
 		return $concert_info;
 	}
 
@@ -73,6 +75,9 @@
 		{
 			$concert_info[] = $res;
 		}
+		
+		$concert_info['VENUE'][] = getConcertVenue($conn, $concert_info[0]['CONCERT_ID']);
+		$concert_info['ARTISTS'][] = getConcertArtists($conn, $concert_info[0]['CONCERT_ID']);
 
 		return $concert_info;
 	}
@@ -105,6 +110,36 @@
 		}
 
 		return $concert_review;
+	}
+
+	function getConcertVenue($conn, $id) {
+		$sql = "select v.venue_id, v.name from venues v, concerts c where c.venue_id=v.venue_id and c.concert_id='$id'";
+
+		$stmt = performQuery($conn, $sql);
+
+		$concert_info = "";
+
+		while ($res = oci_fetch_assoc($stmt))
+		{
+			$concert_info[] = "<li><a href='/~sks2187/w4111/venue.php/?id=".$res['VENUE_ID']."'>".$res['NAME']."</a></li>";
+		}
+
+		return $concert_info;
+	}
+
+	function getConcertArtists($conn, $id) {
+		$sql = "select a.artist_id, a.artist_name from performs p, artists a where p.artist_id=a.artist_id and p.concert_id='$id'";
+
+		$stmt = performQuery($conn, $sql);
+
+		$concert_info = "";
+
+		while ($res = oci_fetch_assoc($stmt))
+		{
+			$concert_info[] = "<li><a href='/~sks2187/w4111/artist.php/?id=".$res['ARTIST_ID']."'>".$res['ARTIST_NAME']."</a></li>";
+		}
+
+		return $concert_info;
 	}
 
 	function otherwise($conn) {
@@ -192,8 +227,18 @@
 					echo ("<h3>Concert name: ".$concert_info[0]['NAME']."</h3>");
 					echo ("<h4>Date: ".$concert_info[0]['CONCERT_DATE']."</h4>");
 					echo ("<h5>Start time: ".$concert_info[0]['START_TIME']."</h5>");
-					//echo ("<h4>Venue: ".$concert_info[0]['GENRE']."</h4>");
-					// add more here 
+					echo ("<h5>Venue: </h5>");
+					echo ("<ul>");
+					foreach ($concert_info['VENUE'][0] as $x) {
+						echo $x;
+					}
+					echo ("</ul>");
+					echo ("<h5>Artists: </h5>");
+					echo ("<ul>");
+					foreach ($concert_info['ARTISTS'][0] as $x) {
+						echo $x;
+					}
+					echo ("</ul>");
 					if (count($concert_info[1]) > 0) {
 						echo ("<h5>Reviews: </h5><p>Username: ".$concert_info[1][0]['USERNAME']."<p><p>".$concert_info[1][0]['REVIEW']."<p>");
 					}
