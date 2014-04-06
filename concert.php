@@ -235,8 +235,10 @@
 					echo ("</ul>");
 					echo ("<h5>Artists: </h5>");
 					echo ("<ul>");
-					foreach ($concert_info['ARTISTS'][0] as $x) {
-						echo $x;
+					if (isset($concerts) && !empty($concerts)) {
+						foreach ($concert_info['ARTISTS'][0] as $x) {
+							echo $x;
+						}
 					}
 					echo ("</ul>");
 					if (count($concert_info[1]) > 0) {

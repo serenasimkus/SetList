@@ -5,6 +5,7 @@
 
 	$venue_info = array();
 	$venues = array();
+	$options = array("AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY");
 
 	if (isset($_GET['id'])) {
 		$id = $_GET['id'];
@@ -26,15 +27,39 @@
 		$venues = otherwise($conn);
 	}
 
-	if (isset($_GET['concert_date'])) {
-		$concert_date = urldecode($_GET['concert_date']);
-		if (strlen($concert_date) > 0) {
-			$venues = searchByDate($conn, $concert_date);
+	if (isset($_GET['city'])) {
+		$city = $_GET['city'];
+		if (strlen($city) > 0) {
+			$venues = searchByCity($conn, $city);
 		} else {
 			$venues = otherwise($conn);
 		}
 	} else {
-		$concert_date = false;
+		$city = false;
+		$venues = otherwise($conn);
+	}
+
+	if (isset($_GET['state'])) {
+		$state = $_GET['state'];
+		if (strlen($state) > 0) {
+			$venues = searchByState($conn, $state);
+		} else {
+			$venues = otherwise($conn);
+		}
+	} else {
+		$state = false;
+		$venues = otherwise($conn);
+	}
+
+	if (isset($_GET['zip'])) {
+		$zip = $_GET['zip'];
+		if (strlen($zip) > 0) {
+			$venues = searchByZip($conn, $zip);
+		} else {
+			$venues = otherwise($conn);
+		}
+	} else {
+		$zip = false;
 		$venues = otherwise($conn);
 	}
 
@@ -82,20 +107,50 @@
 		return $venue_info;
 	}
 
-	// function searchByDate($conn, $concert_date) {
-	// 	$sql = "select * from venues where concert_date='$concert_date'";
+	function searchByCity($conn, $city) {
+		$sql = "select * from venues where city='$city'";
 
-	// 	$stmt = performQuery($conn, $sql);
+		$stmt = performQuery($conn, $sql);
 
-	// 	$venues = "";
+		$venues = "";
 		
-	// 	while ($res = oci_fetch_row($stmt))
-	// 	{
-	// 		$venues[] = "<li><a href='/~sks2187/w4111/concert.php/?id=".$res[0]."'>".$res[1]."</a></li>";
-	// 	}
+		while ($res = oci_fetch_row($stmt))
+		{
+			$venues[] = "<li><a href='/~sks2187/w4111/venue.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+		}
 
-	// 	return $venues;
-	// }
+		return $venues;
+	}
+
+	function searchByState($conn, $state) {
+		$sql = "select * from venues where state='$state'";
+
+		$stmt = performQuery($conn, $sql);
+
+		$venues = "";
+		
+		while ($res = oci_fetch_row($stmt))
+		{
+			$venues[] = "<li><a href='/~sks2187/w4111/venue.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+		}
+
+		return $venues;
+	}
+
+	function searchByZip($conn, $zip) {
+		$sql = "select * from venues where zip='$zip'";
+
+		$stmt = performQuery($conn, $sql);
+
+		$venues = "";
+		
+		while ($res = oci_fetch_row($stmt))
+		{
+			$venues[] = "<li><a href='/~sks2187/w4111/venue.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+		}
+
+		return $venues;
+	}
 
 	function searchByVenueReview($conn, $id) {
 		$sql = "select username, review from reviews_v where venue_id='$id'";
@@ -127,21 +182,6 @@
 		return $venue_info;
 	}
 
-	// function getConcertArtists($conn, $id) {
-	// 	$sql = "select a.artist_id, a.artist_name from performs p, artists a where p.artist_id=a.artist_id and p.concert_id='$id'";
-
-	// 	$stmt = performQuery($conn, $sql);
-
-	// 	$venue_info = "";
-
-	// 	while ($res = oci_fetch_assoc($stmt))
-	// 	{
-	// 		$venue_info[] = "<li><a href='/~sks2187/w4111/artist.php/?id=".$res['ARTIST_ID']."'>".$res['ARTIST_NAME']."</a></li>";
-	// 	}
-
-	// 	return $venue_info;
-	// }
-
 	function otherwise($conn) {
 		$sql = "select * from venues";
 
@@ -149,7 +189,7 @@
 
 		while ($res = oci_fetch_row($stmt))                                                        
 		{
-			$venues[] = "<li><a href='/~sks2187/w4111/concert.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+			$venues[] = "<li><a href='/~sks2187/w4111/venue.php/?id=".$res[0]."'>".$res[1]."</a></li>";
 		}
 
 		return $venues;
@@ -163,15 +203,6 @@
 		<title>SetList</title>
 		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="jqueryui/css/ui-lightness/jqueryui.css"/>
-		<script src="jqueryui/js/jquery.js"></script>
-		<script src="jqueryui/js/jqueryui.js"></script>
-		<script>
-			$(function() {
-				$( "#datepicker" ).datepicker();
-				$( "#datepicker" ).datepicker( "option", "dateFormat", "dd-M-yy" );
-			});
-		</script>
 	</head>
 	
 	<body style="margin-top:60px;">
@@ -210,14 +241,31 @@
 		<div class="container">
 			<h3>Welcome to SetList!</h3>
 			<div class="row">
-				<div class="col-md-6">
+				<div class="col-md-4">
 					<form method="GET" action="">
 						<input type="text" placeholder="Venue name" class="form-control" name="venue_name"/>
 					</form>
 				</div>
-				<div class="col-md-6">
+				<div class="col-md-4">
 					<form method="GET" action="">
-						<input type="text" id="datepicker" placeholder="Concert date" class="form-control" name="concert_date" onchange="this.form.submit();"/>
+						<input type="text" placeholder="City" class="form-control" name="city"/>
+					</form>
+				</div>
+				<div class="col-md-2">
+					<form method="GET" action="">
+						<select class="form-control" name="state" onchange="this.form.submit();">
+							<option value="" default>Select State</option>
+							<?php
+								foreach($options as $a) {
+									echo "<option value=".$a.">".$a."</option>";
+								}
+							?>
+						</select>
+					</form>
+				</div>
+				<div class="col-md-2">
+					<form method="GET" action="">
+						<input type="text" placeholder="Zip code" class="form-control" name="zip"/>
 					</form>
 				</div>
 			</div>
