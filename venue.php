@@ -4,27 +4,29 @@
 	require_once "connection.php";
 
 	$venue_info = array();
-	$venues = array();
+	$venues = otherwise($conn);
 	$options = array("AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY");
 
 	if (isset($_GET['id'])) {
 		$id = $_GET['id'];
 		$venue_info = searchByID($conn, $id);
-		$venue_review = searchByVenueReview($conn, $id);
-		$venue_info[] = $venue_review;
+		if ($venue_info) {
+			$venue_review = searchByVenueReview($conn, $venue_info[0]['VENUE_ID']);
+			$venue_info[] = $venue_review;
+		}
 	} else {
 		$id = false;
-		$venues = otherwise($conn);
 	}
 
 	if (isset($_GET['venue_name'])) {
 		$venue_name = $_GET['venue_name'];
 		$venue_info = searchByVenueName($conn, $venue_name);
-		$venue_review = searchByVenueReview($conn, $venue_info[0]['VENUE_ID']);
-		$venue_info[] = $venue_review;
+		if ($venue_info) {
+			$venue_review = searchByVenueReview($conn, $venue_info[0]['VENUE_ID']);
+			$venue_info[] = $venue_review;
+		}
 	} else {
 		$venue_name = false;
-		$venues = otherwise($conn);
 	}
 
 	if (isset($_GET['city'])) {
@@ -36,7 +38,6 @@
 		}
 	} else {
 		$city = false;
-		$venues = otherwise($conn);
 	}
 
 	if (isset($_GET['state'])) {
@@ -48,7 +49,6 @@
 		}
 	} else {
 		$state = false;
-		$venues = otherwise($conn);
 	}
 
 	if (isset($_GET['zip'])) {
@@ -60,7 +60,6 @@
 		}
 	} else {
 		$zip = false;
-		$venues = otherwise($conn);
 	}
 
 	function performQuery($conn, $sql) {
@@ -80,13 +79,18 @@
 
 		$stmt = performQuery($conn, $sql);
 
+		$venue_info = array();
+
 		while ($res = oci_fetch_assoc($stmt))
 		{
 			$venue_info[] = $res;
 		}
 
-		$venue_info['CONCERTS'][] = getVenueConcerts($conn, $venue_info[0]['VENUE_ID']);
-		//$venue_info['ARTISTS'][] = getConcertArtists($conn, $venue_info[0]['VENUE_ID']);
+		if ($venue_info) {
+			$venue_info['CONCERTS'][] = getVenueConcerts($conn, $venue_info[0]['VENUE_ID']);
+		} else {
+			$_SESSION['Error'] = "Venue does not exist";
+		}
 
 		return $venue_info;
 	}
@@ -96,13 +100,18 @@
 
 		$stmt = performQuery($conn, $sql);
 
+		$venue_info = array();
+
 		while ($res = oci_fetch_assoc($stmt))
 		{
 			$venue_info[] = $res;
 		}
 		
-		$venue_info['CONCERTS'][] = getVenueConcerts($conn, $venue_info[0]['VENUE_ID']);
-		//$venue_info['ARTISTS'][] = getConcertArtists($conn, $venue_info[0]['VENUE_ID']);
+		if ($venue_info) {
+			$venue_info['CONCERTS'][] = getVenueConcerts($conn, $venue_info[0]['VENUE_ID']);
+		} else {
+			$_SESSION['Error'] = "Venue does not exist";
+		}
 
 		return $venue_info;
 	}
@@ -117,6 +126,10 @@
 		while ($res = oci_fetch_row($stmt))
 		{
 			$venues[] = "<li><a href='/~sks2187/w4111/venue.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+		}
+
+		if (!$venues) {
+			$_SESSION['Error'] = "No venues in this city, try another city.";
 		}
 
 		return $venues;
@@ -134,6 +147,10 @@
 			$venues[] = "<li><a href='/~sks2187/w4111/venue.php/?id=".$res[0]."'>".$res[1]."</a></li>";
 		}
 
+		if (!$venues) {
+			$_SESSION['Error'] = "No venues in this state, try another state.";
+		}
+
 		return $venues;
 	}
 
@@ -147,6 +164,10 @@
 		while ($res = oci_fetch_row($stmt))
 		{
 			$venues[] = "<li><a href='/~sks2187/w4111/venue.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+		}
+
+		if (!$venues) {
+			$_SESSION['Error'] = "No venues in this zip code, try another zip code.";
 		}
 
 		return $venues;
@@ -237,6 +258,13 @@
 				</div><!--/.nav-collapse -->
 			</div>
 		</div>
+
+		<?php
+			if (isset($_SESSION['Error']) && !empty($_SESSION['Error'])) {
+				echo '<div class="alert alert-success">'.$_SESSION['Error'].'</div>';
+				$_SESSION['Error'] = "";
+			}
+		?>
 		
 		<div class="container">
 			<h3>Welcome to SetList!</h3>

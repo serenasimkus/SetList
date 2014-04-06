@@ -4,14 +4,13 @@
 	require_once "connection.php";
 	
 	$artist_info = array();
-	$artists = array();
+	$artists = otherwise($conn);
 
 	if (isset($_GET['id'])) {
 		$id = $_GET['id'];
 		$artist_info = searchByID($conn, $id);
 	} else {
 		$id = false;
-		$artists = otherwise($conn);
 	}
 
 	if (isset($_GET['artist_name'])) {
@@ -19,7 +18,6 @@
 		$artist_info = searchByArtistName($conn, $artist_name);
 	} else {
 		$artist_name = false;
-		$artists = otherwise($conn);
 	}
 
 	if (isset($_GET['genre'])) {
@@ -31,7 +29,6 @@
 		}
 	} else {
 		$genre = false;
-		$artists = otherwise($conn);
 	}
 
 	$options = getGenres($conn, $genre);
@@ -72,13 +69,19 @@
 
 		$stmt = performQuery($conn, $sql);
 
+		$artist_info = array();
+
 		while ($res = oci_fetch_assoc($stmt))
 		{
 			$artist_info[] = $res;
 		}
 
-		$artist_info['SONGS'][] = getArtistSongs($conn, $id);
-		$artist_info['CONCERTS'][] = getArtistConcerts($conn, $id);
+		if ($artist_info) {
+			$artist_info['SONGS'][] = getArtistSongs($conn, $artist_info[0]['ARTIST_ID']);
+			$artist_info['CONCERTS'][] = getArtistConcerts($conn, $artist_info[0]['ARTIST_ID']);
+		} else {
+			$_SESSION['Error'] = "Artist does not exist";
+		}
 
 		return $artist_info;
 	}
@@ -88,13 +91,19 @@
 
 		$stmt = performQuery($conn, $sql);
 
+		$artist_info = array();
+
 		while ($res = oci_fetch_assoc($stmt))                                                        
 		{
 			$artist_info[] = $res;
 		}
 
-		$artist_info['SONGS'][] = getArtistSongs($conn, $artist_info[0]['ARTIST_ID']);
-		$artist_info['CONCERTS'][] = getArtistConcerts($conn, $artist_info[0]['ARTIST_ID']);
+		if ($artist_info) {
+			$artist_info['SONGS'][] = getArtistSongs($conn, $artist_info[0]['ARTIST_ID']);
+			$artist_info['CONCERTS'][] = getArtistConcerts($conn, $artist_info[0]['ARTIST_ID']);
+		} else {
+			$_SESSION['Error'] = "Artist does not exist";
+		}
 
 		return $artist_info;
 	}
@@ -117,7 +126,7 @@
 
 		$stmt = performQuery($conn, $sql);
 
-		$artist_info = "";
+		$artist_info = array();
 
 		while ($res = oci_fetch_row($stmt))                                                        
 		{
@@ -132,7 +141,7 @@
 
 		$stmt = performQuery($conn, $sql);
 
-		$artist_info = "";
+		$artist_info = array();
 
 		while ($res = oci_fetch_row($stmt))                                                        
 		{
@@ -197,6 +206,13 @@
 				</div><!--/.nav-collapse -->
 			</div>
 		</div>
+
+		<?php
+			if (isset($_SESSION['Error']) && !empty($_SESSION['Error'])) {
+				echo '<div class="alert alert-success">'.$_SESSION['Error'].'</div>';
+				$_SESSION['Error'] = "";
+			}
+		?>
 		
 		<div class="container">
 			<h3>Welcome to SetList!</h3>

@@ -34,6 +34,15 @@
 		<title>SetList</title>
 		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="jqueryui/css/ui-lightness/jqueryui.css"/>
+		<script src="jqueryui/js/jquery.js"></script>
+		<script src="jqueryui/js/jqueryui.js"></script>
+		<script>
+			$(function() {
+				$( "#datepicker" ).datepicker();
+				$( "#datepicker" ).datepicker( "option", "dateFormat", "dd-M-yy" );
+			});
+		</script>
 	</head>
 	
 	<body style="margin-top:60px;">
@@ -121,7 +130,7 @@
 							  <div class="form-group">
 							    <label for="inputBirthdate" class="col-sm-2 control-label">Birthdate</label>
 							    <div class="col-sm-10">
-							      <input type="text" class="form-control" id="inputBirthdate" placeholder="DD-MON-YYYY" name="birthdate">
+							      <input type="text" id="datepicker" class="form-control" id="inputBirthdate" placeholder="DD-MON-YYYY" name="birthdate">
 							    </div>
 							  </div>
 							  <div class="form-group">

@@ -4,26 +4,28 @@
 	require_once "connection.php";
 
 	$concert_info = array();
-	$concerts = array();
+	$concerts = otherwise($conn);
 
 	if (isset($_GET['id'])) {
 		$id = $_GET['id'];
 		$concert_info = searchByID($conn, $id);
-		$concert_review = searchByConcertReview($conn, $id);
-		$concert_info[] = $concert_review;
+		if ($concert_info) {
+			$concert_review = searchByConcertReview($conn, $id);
+			$concert_info[] = $concert_review;
+		}
 	} else {
 		$id = false;
-		$concerts = otherwise($conn);
 	}
 
 	if (isset($_GET['concert_name'])) {
 		$concert_name = $_GET['concert_name'];
 		$concert_info = searchByConcertName($conn, $concert_name);
-		$concert_review = searchByConcertReview($conn, $concert_info[0]['CONCERT_ID']);
-		$concert_info[] = $concert_review;
+		if ($concert_info) {
+			$concert_review = searchByConcertReview($conn, $concert_info[0]['CONCERT_ID']);
+			$concert_info[] = $concert_review;
+		}
 	} else {
 		$concert_name = false;
-		$concerts = otherwise($conn);
 	}
 
 	if (isset($_GET['concert_date'])) {
@@ -35,7 +37,6 @@
 		}
 	} else {
 		$concert_date = false;
-		$concerts = otherwise($conn);
 	}
 
 	function performQuery($conn, $sql) {
@@ -55,13 +56,19 @@
 
 		$stmt = performQuery($conn, $sql);
 
+		$concert_info = array();
+
 		while ($res = oci_fetch_assoc($stmt))
 		{
 			$concert_info[] = $res;
 		}
 
-		$concert_info['VENUE'][] = getConcertVenue($conn, $concert_info[0]['CONCERT_ID']);
-		$concert_info['ARTISTS'][] = getConcertArtists($conn, $concert_info[0]['CONCERT_ID']);
+		if ($concert_info) {
+			$concert_info['VENUE'][] = getConcertVenue($conn, $concert_info[0]['CONCERT_ID']);
+			$concert_info['ARTISTS'][] = getConcertArtists($conn, $concert_info[0]['CONCERT_ID']);
+		} else {
+			$_SESSION['Error'] = "Concert does not exist";
+		}
 
 		return $concert_info;
 	}
@@ -71,13 +78,19 @@
 
 		$stmt = performQuery($conn, $sql);
 
+		$concert_info = array();
+
 		while ($res = oci_fetch_assoc($stmt))
 		{
 			$concert_info[] = $res;
 		}
 		
-		$concert_info['VENUE'][] = getConcertVenue($conn, $concert_info[0]['CONCERT_ID']);
-		$concert_info['ARTISTS'][] = getConcertArtists($conn, $concert_info[0]['CONCERT_ID']);
+		if ($concert_info) {
+			$concert_info['VENUE'][] = getConcertVenue($conn, $concert_info[0]['CONCERT_ID']);
+			$concert_info['ARTISTS'][] = getConcertArtists($conn, $concert_info[0]['CONCERT_ID']);
+		} else {
+			$_SESSION['Error'] = "Concert does not exist";
+		}
 
 		return $concert_info;
 	}
@@ -87,11 +100,15 @@
 
 		$stmt = performQuery($conn, $sql);
 
-		$concerts = "";
+		$concerts = array();
 		
 		while ($res = oci_fetch_row($stmt))
 		{
 			$concerts[] = "<li><a href='/~sks2187/w4111/concert.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+		}
+
+		if (!$concerts) {
+			$_SESSION['Error'] = "No concerts on this date, try another date.";
 		}
 
 		return $concerts;
@@ -117,7 +134,7 @@
 
 		$stmt = performQuery($conn, $sql);
 
-		$concert_info = "";
+		$concert_info = array();
 
 		while ($res = oci_fetch_assoc($stmt))
 		{
@@ -132,7 +149,7 @@
 
 		$stmt = performQuery($conn, $sql);
 
-		$concert_info = "";
+		$concert_info = array();
 
 		while ($res = oci_fetch_assoc($stmt))
 		{
@@ -206,6 +223,13 @@
 				</div><!--/.nav-collapse -->
 			</div>
 		</div>
+
+		<?php
+			if (isset($_SESSION['Error']) && !empty($_SESSION['Error'])) {
+				echo '<div class="alert alert-success">'.$_SESSION['Error'].'</div>';
+				$_SESSION['Error'] = "";
+			}
+		?>
 		
 		<div class="container">
 			<h3>Welcome to SetList!</h3>

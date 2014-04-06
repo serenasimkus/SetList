@@ -12,16 +12,6 @@
 			$gender = $_POST['gender'];
 		}
 
-		// if (availableUsername($conn, $username)) {
-		// 	$sql = "update users set username='$username', password='$password', birth_date='$birthdate', gender='$gender' where username='".$_SESSION['User']['USERNAME']."'";
-
-		// 	$stmt = performQuery($conn, $sql);
-
-		// 	$_SESSION['User']['USERNAME'] = $username;
-		// 	$_SESSION['User']['PASSWORD'] = $password;
-		// 	$_SESSION['User']['BIRTH_DATE'] = $birthdate;
-		// 	$_SESSION['User']['GENDER'] = $gender;
-		// } else {
 		$sql = "update users set password='$password', birth_date='$birthdate', gender='$gender' where username='".$_SESSION['User']['USERNAME']."'";
 
 		$stmt = performQuery($conn, $sql);
@@ -29,9 +19,6 @@
 		$_SESSION['User']['PASSWORD'] = $password;
 		$_SESSION['User']['BIRTH_DATE'] = $birthdate;
 		$_SESSION['User']['GENDER'] = $gender;
-
-			//$_SESSION['Error'] = "Username unavailable, did not change.";
-		//}
 	}
 
 	function performQuery($conn, $sql) {
@@ -45,22 +32,6 @@
 
 		return $stmt;
 	}
-
-	// function availableUsername($conn, $username) {
-	// 	if ($_SESSION['User']['USERNAME'] != $username) {
-	// 		$sql = "select * from users where username='$username'";
-
-	// 		$user = performQuery($conn, $sql);
-
-	// 		if (!oci_fetch_row($user)) {
-	// 			return true;
-	// 		} else {
-	// 			return false;
-	// 		}
-	// 	} else {
-	// 		return true;
-	// 	}
-	// }
 
 	oci_close($conn);
 ?>
