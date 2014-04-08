@@ -391,7 +391,7 @@
 								type='submit'>Delete Review?</button><input type='text' name='no_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>");
 						} else {
 							echo ("<form class='form-horizontal' role='form' method='POST' action=''><div class='form-group'>");
-							echo ("&nbsp;<button class='btn btn-info' type='submit'>Write a Review</button><input type='text' \
+							echo ("<button class='btn btn-info' style='margin-bottom: 5;' type='submit'>Write a Review</button><input type='text' \
 								name='add_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/>");
 							echo ("<input type='text' placeholder='Concert review' class='form-control' name='concert_review'/>");
 							echo ("</div></form>");

@@ -10,10 +10,6 @@
 	if (isset($_GET['id'])) {
 		$id = $_GET['id'];
 		$venue_info = searchByID($conn, $id);
-		if ($venue_info) {
-			$venue_review = searchByVenueReview($conn, $venue_info[0]['VENUE_ID']);
-			$venue_info[] = $venue_review;
-		}
 	} else {
 		$id = false;
 	}
@@ -21,10 +17,6 @@
 	if (isset($_GET['venue_name'])) {
 		$venue_name = $_GET['venue_name'];
 		$venue_info = searchByVenueName($conn, $venue_name);
-		if ($venue_info) {
-			$venue_review = searchByVenueReview($conn, $venue_info[0]['VENUE_ID']);
-			$venue_info[] = $venue_review;
-		}
 	} else {
 		$venue_name = false;
 	}
@@ -62,6 +54,24 @@
 		$zip = false;
 	}
 
+	if (isset($_POST['add_review']) && isset($_POST['venue_review'])) {
+		$add_review = $_POST['add_review'];
+		$venue_review = $_POST['venue_review'];
+		addReview($conn, $add_review, $venue_review);
+		$concert_info = searchByID($conn, $add_review);
+	} else {
+		$add_review = false;
+		$venue_review = false;
+	}
+
+	if (isset($_POST['no_review'])) {
+		$no_review = $_POST['no_review'];
+		deleteReview($conn, $no_review);
+		$concert_info = searchByID($conn, $no_review);
+	} else {
+		$no_review = false;
+	}
+
 	function performQuery($conn, $sql) {
 		$stmt = oci_parse($conn, $sql);
 		oci_execute($stmt);
@@ -88,6 +98,8 @@
 
 		if ($venue_info) {
 			$venue_info['CONCERTS'][] = getVenueConcerts($conn, $venue_info[0]['VENUE_ID']);
+			$venue_info['REVIEWED'][] = checkReview($conn, $venue_info[0]['VENUE_ID']);
+			$venue_info['REVIEW'][] = getVenueReviews($conn, $venue_info[0]['VENUE_ID']);
 		} else {
 			$_SESSION['Error'] = "Venue does not exist";
 		}
@@ -109,11 +121,50 @@
 		
 		if ($venue_info) {
 			$venue_info['CONCERTS'][] = getVenueConcerts($conn, $venue_info[0]['VENUE_ID']);
+			$venue_info['REVIEWED'][] = checkReview($conn, $venue_info[0]['VENUE_ID']);
+			$venue_info['REVIEW'][] = getVenueReviews($conn, $venue_info[0]['VENUE_ID']);
 		} else {
 			$_SESSION['Error'] = "Venue does not exist";
 		}
 
 		return $venue_info;
+	}
+
+	function checkReview($conn, $add_review) {
+		if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
+			$sql = "select * from reviews_v where venue_id='$add_review' and username='".$_SESSION['User']['USERNAME']."'";
+
+			$stmt = performQuery($conn, $sql);
+
+			$venue_info = array();
+
+			while ($res = oci_fetch_assoc($stmt))
+			{
+				$venue_info[] = $res;
+			}
+
+			return $venue_info;
+		}
+	}
+
+	function addReview($conn, $add_review, $venue_review) {
+		if (!checkReview($conn, $add_review)) {
+			$sql = "insert into reviews_v values ('".$_SESSION['User']['USERNAME']."',".$add_review.",'".$venue_review."')";
+
+			$stmt = performQuery($conn, $sql);
+
+			oci_commit($conn);
+		}
+	}
+
+	function deleteReview($conn, $no_review) {
+		if (checkReview($conn, $no_review)) {
+			$sql = "delete from reviews_v where username='".$_SESSION['User']['USERNAME']."' and venue_id=".$no_review."";
+
+			$stmt = performQuery($conn, $sql);
+
+			oci_commit($conn);
+		}
 	}
 
 	function searchByCity($conn, $city) {
@@ -173,19 +224,19 @@
 		return $venues;
 	}
 
-	function searchByVenueReview($conn, $id) {
+	function getVenueReviews($conn, $id) {
 		$sql = "select username, review from reviews_v where venue_id='$id'";
 
 		$stmt = performQuery($conn, $sql);
 
-		$concert_review = array();
+		$venue_info = array();
 
 		while ($res = oci_fetch_assoc($stmt))
 		{
-			$concert_review[] = $res;
+			$venue_info[] = $res;
 		}
 
-		return $concert_review;
+		return $venue_info;
 	}
 
 	function getVenueConcerts($conn, $id) {
@@ -310,11 +361,27 @@
 						echo $x;
 					}
 					echo ("</ul>");
-					if (count($venue_info[1]) > 0) {
-						echo ("<h5>Reviews: </h5>");
-						
-						echo ("<p>Username: ".$venue_info[1][0]['USERNAME']."<p><p>".$venue_info[1][0]['REVIEW']."<p>");
+					if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
+						if (!empty($venue_info['REVIEWED'][0])) {
+							echo ("&nbsp;<form style='display: inline-block;' method='POST' action=''><button class='btn btn-danger' \
+								type='submit'>Delete Review?</button><input type='text' name='no_review' hidden value='".$venue_info[0]['VENUE_ID']."'/></form>");
+						} else {
+							echo ("<form class='form-horizontal' role='form' method='POST' action=''><div class='form-group'>");
+							echo ("<button class='btn btn-info' style='margin-bottom: 5;' type='submit'>Write a Review</button><input type='text' \
+								name='add_review' hidden value='".$venue_info[0]['VENUE_ID']."'/>");
+							echo ("<input type='text' placeholder='Venue review' class='form-control' name='venue_review'/>");
+							echo ("</div></form>");
+						}
+					} else {
+						echo("&nbsp;<a href='/~sks2187/w4111/login.php' class='btn btn-info'>Sign in to Leave a Review</a>");
 					}
+					echo ("<ul>");
+					if (isset($venues) && !empty($venues)) {
+						foreach ($venue_info['REVIEW'][0] as $x) {
+							echo ("<p>Username: ".$x['USERNAME']."<p><p>".$x['REVIEW']."<p><hr size=4>");
+						}
+					}
+					echo ("</ul>");
 				} else {
 					if (isset($venues) && !empty($venues)) {
 						foreach($venues as $a) {
