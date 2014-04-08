@@ -310,12 +310,6 @@
 						echo $x;
 					}
 					echo ("</ul>");
-					// echo ("<h5>Artists: </h5>");
-					// echo ("<ul>");
-					// foreach ($venue_info['ARTISTS'][0] as $x) {
-					// 	echo $x;
-					// }
-					// echo ("</ul>");
 					if (count($venue_info[1]) > 0) {
 						echo ("<h5>Reviews: </h5><p>Username: ".$venue_info[1][0]['USERNAME']."<p><p>".$venue_info[1][0]['REVIEW']."<p>");
 					}
