@@ -324,6 +324,8 @@
 						echo("&nbsp;<a href='/~sks2187/w4111/login.php' class='btn btn-info'>Sign in to Attend</a>");
 					}
 					echo ("<h4>Date: ".$concert_info[0]['CONCERT_DATE']."</h4>");
+					// $d = new DateTime(str_replace(" PM", "", $concert_info[0]['START_TIME'])." GMT-05:00");
+					// $d->format('h:i')." PM".;
 					echo ("<h5>Start time: ".$concert_info[0]['START_TIME']."</h5>");
 					echo ("<h5>Venue: </h5>");
 					echo ("<ul>");
