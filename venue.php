@@ -311,7 +311,9 @@
 					}
 					echo ("</ul>");
 					if (count($venue_info[1]) > 0) {
-						echo ("<h5>Reviews: </h5><p>Username: ".$venue_info[1][0]['USERNAME']."<p><p>".$venue_info[1][0]['REVIEW']."<p>");
+						echo ("<h5>Reviews: </h5>");
+						
+						echo ("<p>Username: ".$venue_info[1][0]['USERNAME']."<p><p>".$venue_info[1][0]['REVIEW']."<p>");
 					}
 				} else {
 					if (isset($venues) && !empty($venues)) {

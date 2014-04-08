@@ -63,6 +63,32 @@
 		$not_attending = false;
 	}
 
+	if (isset($_POST['write_review']) && isset($_POST['concert_review'])) {
+		$write_review = $_POST['write_review'];
+		$concert_review = $_POST['concert_review'];
+		writeReviewByConcertID($conn, $write_review, $concert_review);
+		$concert_info = searchByID($conn, $write_review);
+		if ($concert_info) {
+			$concert_review = searchByConcertReview($conn, $concert_info[0]['CONCERT_ID']);
+			$concert_info[] = $concert_review;
+		}
+	} else {
+		$write_review = false;
+		$concert_review = false;
+	}
+
+	if (isset($_POST['no_review'])) {
+		$no_review = $_POST['no_review'];
+		deleteReviewByConcertID($conn, $no_review);
+		$concert_info = searchByID($conn, $no_review);
+		if ($concert_info) {
+			$concert_review = searchByConcertReview($conn, $concert_info[0]['CONCERT_ID']);
+			$concert_info[] = $concert_review;
+		}
+	} else {
+		$no_review = false;
+	}
+
 	function performQuery($conn, $sql) {
 		$stmt = oci_parse($conn, $sql);
 		oci_execute($stmt);
@@ -91,6 +117,7 @@
 			$concert_info['VENUE'][] = getConcertVenue($conn, $concert_info[0]['CONCERT_ID']);
 			$concert_info['ARTISTS'][] = getConcertArtists($conn, $concert_info[0]['CONCERT_ID']);
 			$concert_info['ATTENDING'][] = checkAttending($conn, $concert_info[0]['CONCERT_ID']);
+			$concert_info['REVIEWED'][] = checkReview($conn, $concert_info[0]['CONCERT_ID']);
 		} else {
 			$_SESSION['Error'] = "Concert does not exist";
 		}
@@ -114,6 +141,7 @@
 			$concert_info['VENUE'][] = getConcertVenue($conn, $concert_info[0]['CONCERT_ID']);
 			$concert_info['ARTISTS'][] = getConcertArtists($conn, $concert_info[0]['CONCERT_ID']);
 			$concert_info['ATTENDING'][] = checkAttending($conn, $concert_info[0]['CONCERT_ID']);
+			$concert_info['REVIEWED'][] = checkReview($conn, $concert_info[0]['CONCERT_ID']);
 		} else {
 			$_SESSION['Error'] = "Concert does not exist";
 		}
@@ -151,6 +179,43 @@
 	function notAttendByConcertID($conn, $not_attending) {
 		if (checkAttending($conn, $not_attending)) {
 			$sql = "delete from plans_to_attend where username='".$_SESSION['User']['USERNAME']."' and concert_id=".$not_attending."";
+
+			$stmt = performQuery($conn, $sql);
+
+			oci_commit($conn);
+		}
+	}
+
+	function checkReview($conn, $write_review) {
+		if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
+			$sql = "select * from reviews_c where concert_id='$write_review' and username='".$_SESSION['User']['USERNAME']."'";
+
+			$stmt = performQuery($conn, $sql);
+
+			$concert_info = array();
+
+			while ($res = oci_fetch_assoc($stmt))
+			{
+				$concert_info[] = $res;
+			}
+
+			return $concert_info;
+		}
+	}
+
+	function writeReviewByConcertID($conn, $write_review, $concert_review) {
+		if (!checkReview($conn, $write_review)) {
+			$sql = "insert into reviews_c values ('".$_SESSION['User']['USERNAME']."',".$write_review.",".$concert_review")";
+
+			$stmt = performQuery($conn, $sql);
+
+			oci_commit($conn);
+		}
+	}
+
+	function deleteReviewByConcertID($conn, $no_review) {
+		if (checkReview($conn, $no_review)) {
+			$sql = "delete from reviews_c where username='".$_SESSION['User']['USERNAME']."' and concert_id=".$no_review."";
 
 			$stmt = performQuery($conn, $sql);
 
@@ -342,7 +407,21 @@
 					}
 					echo ("</ul>");
 					if (count($concert_info[1]) > 0) {
-						echo ("<h5>Reviews: </h5><p>Username: ".$concert_info[1][0]['USERNAME']."<p><p>".$concert_info[1][0]['REVIEW']."<p>");
+						echo ("<h5>Reviews: </h5>");
+						if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
+							if (!empty($concert_info['REVIEWED'][0])) {
+								echo ("&nbsp;<form style='display: inline-block;' method='POST' action=''><button class='btn btn-danger' \
+									type='submit'>Delete Review?</button><input type='text' name='no_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>");
+							} else {
+								//echo ("&nbsp;<form style='display: inline-block;' method='POST' action=''><button class='btn btn-info' \
+									//type='submit'>Write a Review</button><input type='text' name='add_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>");
+								echo ("<form method='GET' action=''><input type='text' placeholder='Concert review' class='form-control' \
+									name='concert_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>")
+							}
+						} else {
+							echo("&nbsp;<a href='/~sks2187/w4111/login.php' class='btn btn-info'>Sign in to Leave a Review</a>");
+						}
+						echo ("<p>Username: ".$concert_info[1][0]['USERNAME']."<p><p>".$concert_info[1][0]['REVIEW']."<p>");
 					}
 				} else {
 					if (isset($concerts) && !empty($concerts)) {
