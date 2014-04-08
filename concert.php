@@ -63,17 +63,17 @@
 		$not_attending = false;
 	}
 
-	if (isset($_POST['write_review']) && isset($_POST['concert_review'])) {
-		$write_review = $_POST['write_review'];
+	if (isset($_POST['add_review']) && isset($_POST['concert_review'])) {
+		$add_review = $_POST['add_review'];
 		$concert_review = $_POST['concert_review'];
-		writeReviewByConcertID($conn, $write_review, $concert_review);
-		$concert_info = searchByID($conn, $write_review);
+		writeReviewByConcertID($conn, $add_review, $concert_review);
+		$concert_info = searchByID($conn, $add_review);
 		if ($concert_info) {
 			$concert_review = searchByConcertReview($conn, $concert_info[0]['CONCERT_ID']);
 			$concert_info[] = $concert_review;
 		}
 	} else {
-		$write_review = false;
+		$add_review = false;
 		$concert_review = false;
 	}
 
@@ -186,9 +186,9 @@
 		}
 	}
 
-	function checkReview($conn, $write_review) {
+	function checkReview($conn, $add_review) {
 		if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
-			$sql = "select * from reviews_c where concert_id='$write_review' and username='".$_SESSION['User']['USERNAME']."'";
+			$sql = "select * from reviews_c where concert_id='$add_review' and username='".$_SESSION['User']['USERNAME']."'";
 
 			$stmt = performQuery($conn, $sql);
 
@@ -203,9 +203,9 @@
 		}
 	}
 
-	function writeReviewByConcertID($conn, $write_review, $concert_review) {
-		if (!checkReview($conn, $write_review)) {
-			$sql = "insert into reviews_c values ('".$_SESSION['User']['USERNAME']."',".$write_review.",".$concert_review")";
+	function writeReviewByConcertID($conn, $add_review, $concert_review) {
+		if (!checkReview($conn, $add_review)) {
+			$sql = "insert into reviews_c values ('".$_SESSION['User']['USERNAME']."',".$add_review.",".$concert_review")";
 
 			$stmt = performQuery($conn, $sql);
 
@@ -416,8 +416,7 @@
 								echo ("<form class='form-horizontal' role='form' method='POST' action=''><div class='form-group'>");
 								echo ("&nbsp;<button class='btn btn-info' type='submit'>Write a Review</button> \
 									<input type='text' name='add_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/>");
-								echo ("<input type='text' placeholder='Concert review' class='form-control' \
-									name='concert_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/>")
+								echo ("<input type='text' placeholder='Concert review' class='form-control' name='concert_review'/>")
 								echo ("</div></form>")
 							}
 						} else {
