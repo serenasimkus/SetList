@@ -63,9 +63,9 @@
 		$not_attending = false;
 	}
 
-	if (isset($_POST['write_review']) && isset($_POST['concert_review'])) {
+	if (isset($_POST['write_review']) && isset($_GET['concert_review'])) {
 		$write_review = $_POST['write_review'];
-		$concert_review = $_POST['concert_review'];
+		$concert_review = $_GET['concert_review'];
 		writeReviewByConcertID($conn, $write_review, $concert_review);
 		$concert_info = searchByID($conn, $write_review);
 		if ($concert_info) {
