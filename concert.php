@@ -122,34 +122,40 @@
 	}
 
 	function checkAttending($conn, $plans_to_attend) {
-		$sql = "select * from plans_to_attend where concert_id='$plans_to_attend'";
+		if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
+			$sql = "select * from plans_to_attend where concert_id='$plans_to_attend' and username='".$_SESSION['User']['USERNAME']."'";
 
-		$stmt = performQuery($conn, $sql);
+			$stmt = performQuery($conn, $sql);
 
-		$concert_info = array();
+			$concert_info = array();
 
-		while ($res = oci_fetch_assoc($stmt))
-		{
-			$concert_info[] = $res;
+			while ($res = oci_fetch_assoc($stmt))
+			{
+				$concert_info[] = $res;
+			}
+
+			return $concert_info;
 		}
-
-		return $concert_info;
 	}
 
 	function attendByConcertID($conn, $plans_to_attend) {
-		$sql = "insert into plans_to_attend values ('".$_SESSION['User']['USERNAME']."',".$plans_to_attend.")";
+		if (!checkAttending($conn, $plans_to_attend)) {
+			$sql = "insert into plans_to_attend values ('".$_SESSION['User']['USERNAME']."',".$plans_to_attend.")";
 
-		$stmt = performQuery($conn, $sql);
+			$stmt = performQuery($conn, $sql);
 
-		oci_commit($conn);
+			oci_commit($conn);
+		}
 	}
 
 	function notAttendByConcertID($conn, $not_attending) {
-		$sql = "delete from plans_to_attend where username='".$_SESSION['User']['USERNAME']."' and concert_id=".$not_attending."";
+		if (checkAttending($conn, $not_attending)) {
+			$sql = "delete from plans_to_attend where username='".$_SESSION['User']['USERNAME']."' and concert_id=".$not_attending."";
 
-		$stmt = performQuery($conn, $sql);
+			$stmt = performQuery($conn, $sql);
 
-		oci_commit($conn);
+			oci_commit($conn);
+		}
 	}
 
 	function searchByDate($conn, $concert_date) {
@@ -305,15 +311,17 @@
 
 			<?php
 				if (count($concert_info) > 0) {
-					echo ("<h3>Concert name: ".$concert_info[0]['NAME']."</h3>");
+					echo ("<h3 style='display: inline-block; vertical-align: sub;'>Concert name: ".$concert_info[0]['NAME']."</h3>");
 					if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
 						if (!empty($concert_info['ATTENDING'][0])) {
-							echo ("<form method='POST' action=''><button class='btn btn-danger' type='submit'>Not Attending</button><input type='text' name='not_attending' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>");
+							echo ("&nbsp;<form style='display: inline-block;' method='POST' action=''><button class='btn btn-danger' \
+								type='submit'>Not Attending</button><input type='text' name='not_attending' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>");
 						} else {
-							echo ("<form method='POST' action=''><input type='checkbox' name='plans_to_attend' onchange='this.form.submit();' value='".$concert_info[0]['CONCERT_ID']."'/></form>");
+							echo ("&nbsp;<form style='display: inline-block;' method='POST' action=''><button class='btn btn-info' \
+								type='submit'>Attending?</button><input type='text' name='plans_to_attend' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>");
 						}
 					} else {
-						echo("<a href='/~sks2187/w4111/login.php' class='btn btn-info'>Sign in to Attend</a>");
+						echo("&nbsp;<a href='/~sks2187/w4111/login.php' class='btn btn-info'>Sign in to Attend</a>");
 					}
 					echo ("<h4>Date: ".$concert_info[0]['CONCERT_DATE']."</h4>");
 					echo ("<h5>Start time: ".$concert_info[0]['START_TIME']."</h5>");
