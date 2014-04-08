@@ -63,9 +63,9 @@
 		$not_attending = false;
 	}
 
-	if (isset($_POST['write_review']) && isset($_GET['concert_review'])) {
+	if (isset($_POST['write_review']) && isset($_POST['concert_review'])) {
 		$write_review = $_POST['write_review'];
-		$concert_review = $_GET['concert_review'];
+		$concert_review = $_POST['concert_review'];
 		writeReviewByConcertID($conn, $write_review, $concert_review);
 		$concert_info = searchByID($conn, $write_review);
 		if ($concert_info) {
@@ -413,10 +413,12 @@
 								echo ("&nbsp;<form style='display: inline-block;' method='POST' action=''><button class='btn btn-danger' \
 									type='submit'>Delete Review?</button><input type='text' name='no_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>");
 							} else {
-								//echo ("&nbsp;<form style='display: inline-block;' method='POST' action=''><button class='btn btn-info' \
-									//type='submit'>Write a Review</button><input type='text' name='add_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>");
-								echo ("<form method='GET' action=''><input type='text' placeholder='Concert review' class='form-control' \
-									name='concert_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>")
+								echo ("<form class='form-horizontal' role='form' method='POST' action=''><div class='form-group'>");
+								echo ("&nbsp;<button class='btn btn-info' type='submit'>Write a Review</button> \
+									<input type='text' name='add_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/>");
+								echo ("<input type='text' placeholder='Concert review' class='form-control' \
+									name='concert_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/>")
+								echo ("</div></form>")
 							}
 						} else {
 							echo("&nbsp;<a href='/~sks2187/w4111/login.php' class='btn btn-info'>Sign in to Leave a Review</a>");
