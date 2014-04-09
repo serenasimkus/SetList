@@ -3,9 +3,9 @@
 	ini_set('display_errors', 'On'); 
 	require_once "connection.php";
 
-	$attending = array();
-	$concert_reviews = array();
-	$venue_reviews = array();
+	// $attending = array();
+	// $concert_reviews = array();
+	// $venue_reviews = array();
 
 	if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
 		$username = $_SESSION['User']['USERNAME'];
@@ -46,7 +46,7 @@
 	}
 
 	function getConcertReviews($conn, $username) {
-		$sql = "select * from reviews_c r, concerts c where r.concert_id=c.concert_id and p.username='$username'";
+		$sql = "select * from reviews_c r, concerts c where r.concert_id=c.concert_id and r.username='$username'";
 
 		$stmt = performQuery($conn, $sql);
 
@@ -85,7 +85,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 	
-	<body style="margin-top:60px;">
+	<body style="margin-top:50px;">
 		<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 			<div class="container">
 				<div class="navbar-header">
@@ -117,38 +117,50 @@
 				</div><!--/.nav-collapse -->
 			</div>
 		</div>
-		
-		<div class="container">
-			<h3>Welcome to SetList!</h3>
-				<div class="col-md-4">
-					<ul class="nav nav-pills nav-stacked">
-						<?php
-							if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
-								echo ("<h4>Concerts Attending:</h4>");
-								foreach($attending as $a) {
-									echo $a;
-								}
-								echo ("<h4>Reviews For:</h4>");
-								echo ("<h5>Concerts:</h5>");
-								foreach($concert_reviews as $c) {
-									echo $c;
-								}
-								echo ("<h5>Venues:</h5>");
-								foreach($venue_reviews as $v) {
-									echo $v;
-								}
-							} else {
-								echo ("<a href='/~sks2187/w4111/login.php' style='margin-bottom: 10;' class='btn btn-info'>Sign in to See Your Information</a>");
+
+		<div class="col-md-3" style="background-color: #222; height: 100%; overflow: scroll; padding-bottom: 20px;">
+			<ul class="nav nav-pills nav-stacked">
+				<?php
+					if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
+						echo ("<h4 style='color: #FFF;'>Concerts Attending:</h4>");
+						if (!empty($attending)) {
+							foreach($attending as $a) {
+								echo $a;
 							}
-						?>
+						} else {
+							echo ("<a href='/~sks2187/w4111/concert.php' class='btn btn-info'>Find some concerts to attend!</a>");
+						}
+						echo ("<h4 style='color: #FFF;'>Reviews For:</h4>");
+						echo ("<h5 style='color: #FFF;'>Concerts:</h5>");
+						if (!empty($concert_reviews)) {
+							foreach($concert_reviews as $c) {
+								echo $c;
+							}
+						} else {
+							echo ("<a href='/~sks2187/w4111/concert.php' class='btn btn-info'>Review a concert?</a>");
+						}
+						echo ("<h5 style='color: #FFF;'>Venues:</h5>");
+						if (!empty($venue_reviews)) {
+							foreach($venue_reviews as $v) {
+								echo $v;
+							}
+						} else {
+							echo ("<a href='/~sks2187/w4111/venue.php' class='btn btn-info'>Review a venue?</a>");
+						}
+					} else {
+						echo ("<a href='/~sks2187/w4111/login.php' style='margin-bottom: 10;' class='btn btn-info'>Login to See Your Information</a>");
+					}
+				?>
 
 
-					</ul>
-				</div>
-
-				<div class="col-md-8">
-
-				</div> 
+			</ul>
 		</div>
+
+		<div class="col-md-9">
+			<div class="container">
+				<h3>Welcome to SetList!</h3>
+				
+			</div>
+		</div> 
 	</body>
 </html>

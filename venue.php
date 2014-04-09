@@ -277,7 +277,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 	
-	<body style="margin-top:60px;">
+	<body style="margin-top:50px;">
 		<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 			<div class="container">
 				<div class="navbar-header">
@@ -366,7 +366,7 @@
 							echo ("<form style='display: inline-block;' method='POST' action=''><button class='btn btn-danger' type='submit'>Delete Review?</button><input type='text' name='no_review' hidden value='".$venue_info[0]['VENUE_ID']."'/></form>");
 						} else {
 							echo ("<form class='form-horizontal' role='form' method='POST' action=''><div class='form-group'>");
-							echo ("<button class='btn btn-info' style='margin-bottom: 5;' type='submit'>Write a Review</button><input type='text' \
+							echo ("<button class='btn btn-info' style='margin-bottom: 5;' type='submit'>Save Review</button><input type='text' \
 								name='add_review' hidden value='".$venue_info[0]['VENUE_ID']."'/>");
 							echo ("<input type='text' placeholder='Venue review' class='form-control' name='venue_review'/>");
 							echo ("</div></form>");

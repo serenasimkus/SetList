@@ -45,7 +45,7 @@
 		</script>
 	</head>
 	
-	<body style="margin-top:60px;">
+	<body style="margin-top:50px;">
 		<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 			<div class="container">
 				<div class="navbar-header">
