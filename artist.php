@@ -206,12 +206,6 @@
 			</div>
 		</div>
 
-		<?php
-			if (isset($_SESSION['Error']) && !empty($_SESSION['Error'])) {
-				echo '<div class="alert alert-success">'.$_SESSION['Error'].'</div>';
-				$_SESSION['Error'] = "";
-			}
-		?>
 
 		<div class="col-md-3" style="background-color: #222; height: 100%; overflow: scroll; padding-bottom: 20px;">
 			<ul class="nav nav-pills nav-stacked">
@@ -250,6 +244,12 @@
 		</div>
 
 		<div class="col-md-9" style="overflow: scroll; height: 100%;">
+			<?php
+				if (isset($_SESSION['Error']) && !empty($_SESSION['Error'])) {
+					echo '<div class="alert alert-success">'.$_SESSION['Error'].'</div>';
+					$_SESSION['Error'] = "";
+				}
+			?>
 			<h3>Welcome to SetList!</h3>
 			<div class="row">
 				<div class="col-md-6">
