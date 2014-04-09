@@ -65,16 +65,15 @@
 		$no_review = false;
 	}
 
-	function performQuery($conn, $sql) {
-		$stmt = oci_parse($conn, $sql);
-		oci_execute($stmt);
-
-		$err = oci_error($stmt);
-		if ($err) {
-			echo $err;
-		}
-
-		return $stmt;
+	if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
+		$username = $_SESSION['User']['USERNAME'];
+		$attending = getAttending($conn, $username);
+		$concert_reviews = getSidebarConcertReviews($conn, $username);
+		$venue_reviews = getSidebarVenueReviews($conn, $username);
+	} else {
+		$attending = false;
+		$concert_reviews = false;
+		$venue_reviews = false;
 	}
 
 	function searchByID($conn, $id) {
@@ -336,8 +335,44 @@
 				$_SESSION['Error'] = "";
 			}
 		?>
+
+		<div class="col-md-3" style="background-color: #222; height: 100%; overflow: scroll; padding-bottom: 20px;">
+			<ul class="nav nav-pills nav-stacked">
+				<?php
+					if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
+						echo ("<h4 style='color: #FFF;'>Concerts Attending:</h4>");
+						if (!empty($attending)) {
+							foreach($attending as $a) {
+								echo $a;
+							}
+						} else {
+							echo ("<a href='/~sks2187/w4111/concert.php' class='btn btn-info'>Find some concerts to attend!</a>");
+						}
+						echo ("<h4 style='color: #FFF;'>Reviews For:</h4>");
+						echo ("<h5 style='color: #FFF;'>Concerts:</h5>");
+						if (!empty($concert_reviews)) {
+							foreach($concert_reviews as $c) {
+								echo $c;
+							}
+						} else {
+							echo ("<a href='/~sks2187/w4111/concert.php' class='btn btn-info'>Review a concert?</a>");
+						}
+						echo ("<h5 style='color: #FFF;'>Venues:</h5>");
+						if (!empty($venue_reviews)) {
+							foreach($venue_reviews as $v) {
+								echo $v;
+							}
+						} else {
+							echo ("<a href='/~sks2187/w4111/venue.php' class='btn btn-info'>Review a venue?</a>");
+						}
+					} else {
+						echo ("<a href='/~sks2187/w4111/login.php' style='display: block; margin-top: 10px;' class='btn btn-info'>Login to See Your Information</a>");
+					}
+				?>
+			</ul>
+		</div>
 		
-		<div class="container">
+		<div class="col-md-9" style="overflow: scroll; height: 100%;">
 			<h3>Welcome to SetList!</h3>
 			<div class="row">
 				<div class="col-md-6">
@@ -352,68 +387,70 @@
 				</div>
 			</div>
 
-			<?php
-				if (count($concert_info) > 0) {
-					echo ("<h3 style='display: inline-block; vertical-align: sub;'>Concert name: ".$concert_info[0]['NAME']."</h3>");
-					if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
-						if (!empty($concert_info['ATTENDING'][0])) {
-							echo ("&nbsp;<form style='display: inline-block;' method='POST' action=''><button class='btn btn-danger' \
-								type='submit'>Not Attending</button><input type='text' name='not_attending' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>");
+			<div class="row">
+				<div class="col-md-12">
+					<?php
+						if (count($concert_info) > 0) {
+							echo ("<h3 style='display: inline-block; vertical-align: sub;'>Concert name: ".$concert_info[0]['NAME']."</h3>");
+							if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
+								if (!empty($concert_info['ATTENDING'][0])) {
+									echo ("&nbsp;<form style='display: inline-block;' method='POST' action=''><button class='btn btn-danger' \
+										type='submit'>Not Attending</button><input type='text' name='not_attending' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>");
+								} else {
+									echo ("&nbsp;<form style='display: inline-block;' method='POST' action=''><button class='btn btn-info' \
+										type='submit'>Attending?</button><input type='text' name='plans_to_attend' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>");
+								}
+							} else {
+								echo("&nbsp;<a href='/~sks2187/w4111/login.php' class='btn btn-info'>Sign in to Attend</a>");
+							}
+							echo ("<h4>Date: ".$concert_info[0]['CONCERT_DATE']."</h4>");
+							echo ("<h5>Start time: ".$concert_info[0]['START_TIME']."</h5>");
+							echo ("<h5>Venue: </h5>");
+							echo ("<ul>");
+							foreach ($concert_info['VENUE'][0] as $x) {
+								echo $x;
+							}
+							echo ("</ul>");
+							echo ("<h5>Artists: </h5>");
+							echo ("<ul>");
+							if (isset($concerts) && !empty($concerts)) {
+								foreach ($concert_info['ARTISTS'][0] as $x) {
+									echo $x;
+								}
+							}
+							echo ("</ul>");
+							echo ("<h5>Reviews: </h5>");
+							if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
+								if (!empty($concert_info['REVIEWED'][0])) {
+									echo ("<form style='display: inline-block;' method='POST' action=''><button class='btn btn-danger' \
+										type='submit'>Delete Review?</button><input type='text' name='no_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>");
+								} else {
+									echo ("<form class='form-horizontal' role='form' method='POST' action=''><div>");
+									echo ("<button class='btn btn-info' style='margin-bottom: 5;' type='submit'>Save Review</button><input type='text' \
+										name='add_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/>");
+									echo ("<input type='text' placeholder='Concert review' class='form-control' name='concert_review'/>");
+									echo ("</div></form>");
+								}
+							} else {
+								echo ("<a href='/~sks2187/w4111/login.php' style='margin-bottom: 10;' class='btn btn-info'>Sign in to Leave a Review</a>");
+							}
+							echo ("<ul>");
+							if (isset($concerts) && !empty($concerts)) {
+								foreach ($concert_info['REVIEW'][0] as $x) {
+									echo ("<p>Username: ".$x['USERNAME']."<p><p>".$x['REVIEW']."<p><hr size=4>");
+								}
+							}
+							echo ("</ul>");
 						} else {
-							echo ("&nbsp;<form style='display: inline-block;' method='POST' action=''><button class='btn btn-info' \
-								type='submit'>Attending?</button><input type='text' name='plans_to_attend' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>");
+							if (isset($concerts) && !empty($concerts)) {
+								foreach($concerts as $a) {
+									echo $a;
+								}
+							}
 						}
-					} else {
-						echo("&nbsp;<a href='/~sks2187/w4111/login.php' class='btn btn-info'>Sign in to Attend</a>");
-					}
-					echo ("<h4>Date: ".$concert_info[0]['CONCERT_DATE']."</h4>");
-					// $d = new DateTime(str_replace(" PM", "", $concert_info[0]['START_TIME'])." GMT-05:00");
-					// $d->format('h:i')." PM".;
-					echo ("<h5>Start time: ".$concert_info[0]['START_TIME']."</h5>");
-					echo ("<h5>Venue: </h5>");
-					echo ("<ul>");
-					foreach ($concert_info['VENUE'][0] as $x) {
-						echo $x;
-					}
-					echo ("</ul>");
-					echo ("<h5>Artists: </h5>");
-					echo ("<ul>");
-					if (isset($concerts) && !empty($concerts)) {
-						foreach ($concert_info['ARTISTS'][0] as $x) {
-							echo $x;
-						}
-					}
-					echo ("</ul>");
-					echo ("<h5>Reviews: </h5>");
-					if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
-						if (!empty($concert_info['REVIEWED'][0])) {
-							echo ("<form style='display: inline-block;' method='POST' action=''><button class='btn btn-danger' \
-								type='submit'>Delete Review?</button><input type='text' name='no_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>");
-						} else {
-							echo ("<form class='form-horizontal' role='form' method='POST' action=''><div class='form-group'>");
-							echo ("<button class='btn btn-info' style='margin-bottom: 5;' type='submit'>Save Review</button><input type='text' \
-								name='add_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/>");
-							echo ("<input type='text' placeholder='Concert review' class='form-control' name='concert_review'/>");
-							echo ("</div></form>");
-						}
-					} else {
-						echo ("<a href='/~sks2187/w4111/login.php' style='margin-bottom: 10;' class='btn btn-info'>Sign in to Leave a Review</a>");
-					}
-					echo ("<ul>");
-					if (isset($concerts) && !empty($concerts)) {
-						foreach ($concert_info['REVIEW'][0] as $x) {
-							echo ("<p>Username: ".$x['USERNAME']."<p><p>".$x['REVIEW']."<p><hr size=4>");
-						}
-					}
-					echo ("</ul>");
-				} else {
-					if (isset($concerts) && !empty($concerts)) {
-						foreach($concerts as $a) {
-							echo $a;
-						}
-					}
-				}
-			?>
+					?>
+				</div>
+			</div>
 		</div>
 	</body>
 </html>

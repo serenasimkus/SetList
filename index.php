@@ -3,76 +3,15 @@
 	ini_set('display_errors', 'On'); 
 	require_once "connection.php";
 
-	// $attending = array();
-	// $concert_reviews = array();
-	// $venue_reviews = array();
-
 	if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
 		$username = $_SESSION['User']['USERNAME'];
 		$attending = getAttending($conn, $username);
-		$concert_reviews = getConcertReviews($conn, $username);
-		$venue_reviews = getVenueReviews($conn, $username);
+		$concert_reviews = getSidebarConcertReviews($conn, $username);
+		$venue_reviews = getSidebarVenueReviews($conn, $username);
 	} else {
 		$attending = false;
 		$concert_reviews = false;
 		$venue_reviews = false;
-	}
-
-	function performQuery($conn, $sql) {
-		$stmt = oci_parse($conn, $sql);
-		oci_execute($stmt);
-
-		$err = oci_error($stmt);
-		if ($err) {
-			echo $err;
-		}
-
-		return $stmt;
-	}
-
-	function getAttending($conn, $username) {
-		$sql = "select * from plans_to_attend p, concerts c where p.concert_id=c.concert_id and p.username='$username'";
-
-		$stmt = performQuery($conn, $sql);
-
-		$attending = array();
-
-		while ($res = oci_fetch_assoc($stmt))
-		{
-			$attending[] = "<li><a href='/~sks2187/w4111/concert.php/?id=".$res['CONCERT_ID']."'>".$res['NAME']."</a></li>";
-		}
-
-		return $attending;
-	}
-
-	function getConcertReviews($conn, $username) {
-		$sql = "select * from reviews_c r, concerts c where r.concert_id=c.concert_id and r.username='$username'";
-
-		$stmt = performQuery($conn, $sql);
-
-		$concert_reviews = array();
-
-		while ($res = oci_fetch_assoc($stmt))
-		{
-			$concert_reviews[] = "<li><a href='/~sks2187/w4111/concert.php/?id=".$res['CONCERT_ID']."'>".$res['NAME']."</a></li>";
-		}
-
-		return $concert_reviews;
-	}
-
-	function getVenueReviews($conn, $username) {
-		$sql = "select * from reviews_v r, venues v where r.venue_id=v.venue_id and r.username='$username'";
-
-		$stmt = performQuery($conn, $sql);
-
-		$venue_reviews = array();
-
-		while ($res = oci_fetch_assoc($stmt))
-		{
-			$venue_reviews[] = "<li><a href='/~sks2187/w4111/venue.php/?id=".$res['VENUE_ID']."'>".$res['NAME']."</a></li>";
-		}
-
-		return $venue_reviews;
 	}
 
 	oci_close($conn);
@@ -148,19 +87,15 @@
 							echo ("<a href='/~sks2187/w4111/venue.php' class='btn btn-info'>Review a venue?</a>");
 						}
 					} else {
-						echo ("<a href='/~sks2187/w4111/login.php' style='margin-bottom: 10;' class='btn btn-info'>Login to See Your Information</a>");
+						echo ("<a href='/~sks2187/w4111/login.php' style='display: block; margin-top: 10px;' class='btn btn-info'>Login to See Your Information</a>");
 					}
 				?>
-
-
 			</ul>
 		</div>
 
-		<div class="col-md-9">
-			<div class="container">
-				<h3>Welcome to SetList!</h3>
+		<div class="col-md-9" style="overflow: scroll; height: 100%;" >
+			<h3>Welcome to SetList!</h3>
 				
-			</div>
 		</div> 
 	</body>
 </html>

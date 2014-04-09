@@ -31,19 +31,18 @@
 		$genre = false;
 	}
 
-	$options = getGenres($conn, $genre);
-
-	function performQuery($conn, $sql) {
-		$stmt = oci_parse($conn, $sql);
-		oci_execute($stmt);
-
-		$err = oci_error($stmt);
-		if ($err) {
-			echo $err;
-		}
-
-		return $stmt;
+	if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
+		$username = $_SESSION['User']['USERNAME'];
+		$attending = getAttending($conn, $username);
+		$concert_reviews = getSidebarConcertReviews($conn, $username);
+		$venue_reviews = getSidebarVenueReviews($conn, $username);
+	} else {
+		$attending = false;
+		$concert_reviews = false;
+		$venue_reviews = false;
 	}
+
+	$options = getGenres($conn, $genre);
 
 	function getGenres($conn, $genre) {
 		$sql = "select genre from artists";
@@ -213,8 +212,44 @@
 				$_SESSION['Error'] = "";
 			}
 		?>
-		
-		<div class="container">
+
+		<div class="col-md-3" style="background-color: #222; height: 100%; overflow: scroll; padding-bottom: 20px;">
+			<ul class="nav nav-pills nav-stacked">
+				<?php
+					if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
+						echo ("<h4 style='color: #FFF;'>Concerts Attending:</h4>");
+						if (!empty($attending)) {
+							foreach($attending as $a) {
+								echo $a;
+							}
+						} else {
+							echo ("<a href='/~sks2187/w4111/concert.php' class='btn btn-info'>Find some concerts to attend!</a>");
+						}
+						echo ("<h4 style='color: #FFF;'>Reviews For:</h4>");
+						echo ("<h5 style='color: #FFF;'>Concerts:</h5>");
+						if (!empty($concert_reviews)) {
+							foreach($concert_reviews as $c) {
+								echo $c;
+							}
+						} else {
+							echo ("<a href='/~sks2187/w4111/concert.php' class='btn btn-info'>Review a concert?</a>");
+						}
+						echo ("<h5 style='color: #FFF;'>Venues:</h5>");
+						if (!empty($venue_reviews)) {
+							foreach($venue_reviews as $v) {
+								echo $v;
+							}
+						} else {
+							echo ("<a href='/~sks2187/w4111/venue.php' class='btn btn-info'>Review a venue?</a>");
+						}
+					} else {
+						echo ("<a href='/~sks2187/w4111/login.php' style='display: block; margin-top: 10px;' class='btn btn-info'>Login to See Your Information</a>");
+					}
+				?>
+			</ul>
+		</div>
+
+		<div class="col-md-9" style="overflow: scroll; height: 100%;">
 			<h3>Welcome to SetList!</h3>
 			<div class="row">
 				<div class="col-md-6">
@@ -236,29 +271,33 @@
 				</div>
 			</div>
 
-			<?php
-				if (count($artist_info) > 0) {
-					echo ("<h3>Artist name: ".$artist_info[0]['ARTIST_NAME']."</h3>");
-					echo ("<h4>Genre: ".$artist_info[0]['GENRE']."</h4>");
-					echo ("<p>Bio: ".$artist_info[0]['BIO']."<p>");
-					echo ("<h4>Concerts: </h4>");
-					echo ("<ul>");
-					foreach ($artist_info['CONCERTS'][0] as $x) {
-						echo $x;
-					}
-					echo ("</ul>");
-					echo ("<h4>Songs: </h4>");
-					echo ("<ul>");
-					foreach ($artist_info['SONGS'][0] as $x) {
-						echo $x;
-					}
-					echo ("</ul>");
-				} else {
-					foreach ($artists as $a) {
-						echo $a;
-					}
-				}
-			?>
+			<div class="row">
+				<div class="col-md-12">
+					<?php
+						if (count($artist_info) > 0) {
+							echo ("<h3>Artist name: ".$artist_info[0]['ARTIST_NAME']."</h3>");
+							echo ("<h4>Genre: ".$artist_info[0]['GENRE']."</h4>");
+							echo ("<p>Bio: ".$artist_info[0]['BIO']."<p>");
+							echo ("<h4>Concerts: </h4>");
+							echo ("<ul>");
+							foreach ($artist_info['CONCERTS'][0] as $x) {
+								echo $x;
+							}
+							echo ("</ul>");
+							echo ("<h4>Songs: </h4>");
+							echo ("<ul>");
+							foreach ($artist_info['SONGS'][0] as $x) {
+								echo $x;
+							}
+							echo ("</ul>");
+						} else {
+							foreach ($artists as $a) {
+								echo $a;
+							}
+						}
+					?>
+				</div>
+			</div>
 		</div>
 	</body>
 </html>

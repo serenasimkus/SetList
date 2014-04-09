@@ -21,18 +21,6 @@
 		$_SESSION['User']['GENDER'] = $gender;
 	}
 
-	function performQuery($conn, $sql) {
-		$stmt = oci_parse($conn, $sql);
-		oci_execute($stmt);
-
-		$err = oci_error($stmt);
-		if ($err) {
-			echo $err;
-		}
-
-		return $stmt;
-	}
-
 	oci_close($conn);
 ?>
 
