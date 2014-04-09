@@ -387,7 +387,7 @@
 					echo ("<h5>Reviews: </h5>");
 					if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
 						if (!empty($concert_info['REVIEWED'][0])) {
-							echo ("&nbsp;<form style='display: inline-block;' method='POST' action=''><button class='btn btn-danger' \
+							echo ("<form style='display: inline-block;' method='POST' action=''><button class='btn btn-danger' \
 								type='submit'>Delete Review?</button><input type='text' name='no_review' hidden value='".$concert_info[0]['CONCERT_ID']."'/></form>");
 						} else {
 							echo ("<form class='form-horizontal' role='form' method='POST' action=''><div class='form-group'>");
@@ -397,7 +397,7 @@
 							echo ("</div></form>");
 						}
 					} else {
-						echo("&nbsp;<a href='/~sks2187/w4111/login.php' class='btn btn-info'>Sign in to Leave a Review</a>");
+						echo ("<a href='/~sks2187/w4111/login.php' style='margin-bottom: 10;' class='btn btn-info'>Sign in to Leave a Review</a>");
 					}
 					echo ("<ul>");
 					if (isset($concerts) && !empty($concerts)) {

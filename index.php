@@ -3,13 +3,78 @@
 	ini_set('display_errors', 'On'); 
 	require_once "connection.php";
 
-	$stmt = oci_parse($conn, "select * from artists");
-	oci_execute($stmt, OCI_DEFAULT);
-	$artist = array();
-	while ($res = oci_fetch_row($stmt))                                                        
-	{
-		$artist[] = "<li><a href='artist.php/?id=".$res[0]."'>".$res[1]."</a></li>";
+	$attending = array();
+	$concert_reviews = array();
+	$venue_reviews = array();
+
+	if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
+		$username = $_SESSION['User']['USERNAME'];
+		$attending = getAttending($conn, $username);
+		$concert_reviews = getConcertReviews($conn, $username);
+		$venue_reviews = getVenueReviews($conn, $username);
+	} else {
+		$attending = false;
+		$concert_reviews = false;
+		$venue_reviews = false;
 	}
+
+	function performQuery($conn, $sql) {
+		$stmt = oci_parse($conn, $sql);
+		oci_execute($stmt);
+
+		$err = oci_error($stmt);
+		if ($err) {
+			echo $err;
+		}
+
+		return $stmt;
+	}
+
+	function getAttending($conn, $username) {
+		$sql = "select * from plans_to_attend p, concerts c where p.concert_id=c.concert_id and p.username='$username'";
+
+		$stmt = performQuery($conn, $sql);
+
+		$attending = array();
+
+		while ($res = oci_fetch_assoc($stmt))
+		{
+			$attending[] = "<li><a href='/~sks2187/w4111/concert.php/?id=".$res['CONCERT_ID']."'>".$res['NAME']."</a></li>";
+		}
+
+		return $attending;
+	}
+
+	function getConcertReviews($conn, $username) {
+		$sql = "select * from reviews_c r, concerts c where r.concert_id=c.concert_id and p.username='$username'";
+
+		$stmt = performQuery($conn, $sql);
+
+		$concert_reviews = array();
+
+		while ($res = oci_fetch_assoc($stmt))
+		{
+			$concert_reviews[] = "<li><a href='/~sks2187/w4111/concert.php/?id=".$res['CONCERT_ID']."'>".$res['NAME']."</a></li>";
+		}
+
+		return $concert_reviews;
+	}
+
+	function getVenueReviews($conn, $username) {
+		$sql = "select * from reviews_v r, venues v where r.venue_id=v.venue_id and r.username='$username'";
+
+		$stmt = performQuery($conn, $sql);
+
+		$venue_reviews = array();
+
+		while ($res = oci_fetch_assoc($stmt))
+		{
+			$venue_reviews[] = "<li><a href='/~sks2187/w4111/venue.php/?id=".$res['VENUE_ID']."'>".$res['NAME']."</a></li>";
+		}
+
+		return $venue_reviews;
+	}
+
 	oci_close($conn);
 ?>
 
@@ -55,11 +120,35 @@
 		
 		<div class="container">
 			<h3>Welcome to SetList!</h3>
-			<?php
-				foreach($artist as $a) {
-					echo $a;
-				}
-			?>
+				<div class="col-md-4">
+					<ul class="nav nav-pills nav-stacked">
+						<?php
+							if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
+								echo ("<h4>Concerts Attending:</h4>");
+								foreach($attending as $a) {
+									echo $a;
+								}
+								echo ("<h4>Reviews For:</h4>");
+								echo ("<h5>Concerts:</h5>");
+								foreach($concert_reviews as $c) {
+									echo $c;
+								}
+								echo ("<h5>Venues:</h5>");
+								foreach($venue_reviews as $v) {
+									echo $v;
+								}
+							} else {
+								echo ("<a href='/~sks2187/w4111/login.php' style='margin-bottom: 10;' class='btn btn-info'>Sign in to See Your Information</a>");
+							}
+						?>
+
+
+					</ul>
+				</div>
+
+				<div class="col-md-8">
+
+				</div> 
 		</div>
 	</body>
 </html>

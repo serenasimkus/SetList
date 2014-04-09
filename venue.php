@@ -363,8 +363,7 @@
 					echo ("</ul>");
 					if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
 						if (!empty($venue_info['REVIEWED'][0])) {
-							echo ("&nbsp;<form style='display: inline-block;' method='POST' action=''><button class='btn btn-danger' \
-								type='submit'>Delete Review?</button><input type='text' name='no_review' hidden value='".$venue_info[0]['VENUE_ID']."'/></form>");
+							echo ("<form style='display: inline-block;' method='POST' action=''><button class='btn btn-danger' type='submit'>Delete Review?</button><input type='text' name='no_review' hidden value='".$venue_info[0]['VENUE_ID']."'/></form>");
 						} else {
 							echo ("<form class='form-horizontal' role='form' method='POST' action=''><div class='form-group'>");
 							echo ("<button class='btn btn-info' style='margin-bottom: 5;' type='submit'>Write a Review</button><input type='text' \
@@ -373,7 +372,7 @@
 							echo ("</div></form>");
 						}
 					} else {
-						echo("&nbsp;<a href='/~sks2187/w4111/login.php' class='btn btn-info'>Sign in to Leave a Review</a>");
+						echo ("<a href='/~sks2187/w4111/login.php' style='margin-bottom: 10;' class='btn btn-info'>Sign in to Leave a Review</a>");
 					}
 					echo ("<ul>");
 					if (isset($venues) && !empty($venues)) {
