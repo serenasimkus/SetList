@@ -179,7 +179,7 @@
 					</ul>
 				</div>
 				<div class="col-md-6">
-					<h4>Because you attended concerts in these same states...</h4>
+					<h4>Because you attended concerts at venues in these same states...</h4>
 					<ul>
 						<?php
 							if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
