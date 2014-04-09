@@ -9,13 +9,13 @@
 		$concert_reviews = getSidebarConcertReviews($conn, $username);
 		$venue_reviews = getSidebarVenueReviews($conn, $username);
 		$genreRecommendations = getGenreRecommendations($conn, $username);
-		//$venueRecommendations = getVenueRecommendations($conn, $username);
+		$venueRecommendations = getVenueRecommendations($conn, $username);
 	} else {
 		$attending = false;
 		$concert_reviews = false;
 		$venue_reviews = false;
 		$genreRecommendations = false;
-		//$venueRecommendations = false;
+		$venueRecommendations = false;
 	}
 
 	function getGenreRecommendations($conn, $username) {
@@ -27,12 +27,12 @@
 										   from plans_to_attend l, (select a.artist_id, a.genre, p.concert_id 
 										   							from artists a, performs p 
 										   							where a.artist_id=p.artist_id) y
-										   where l.username='serenasimkus' and l.concert_id=y.concert_id) 
+										   where l.username='$username' and l.concert_id=y.concert_id) 
 					and x.genre in (select y.genre
 									from plans_to_attend l, (select a.artist_id, a.genre, p.concert_id 
 															 from artists a, performs p 
 															 where a.artist_id=p.artist_id) y
-									where l.username='serenasimkus' and l.concert_id=y.concert_id)";
+									where l.username='$username' and l.concert_id=y.concert_id)";
 		
 		$stmt = performQuery($conn, $sql);
 
@@ -44,6 +44,34 @@
 		}
 
 		return $genreRecommendations;
+	}
+
+	function getVenueRecommendations($conn, $username) {
+		$sql = "select distinct(x.concert_id), x.name
+				from (select v.state, c.concert_id, c.name 
+					  from venues v, concerts c 
+					  where c.venue_id=v.venue_id) x
+				where x.concert_id not in (select l.concert_id
+										   from plans_to_attend l, (select v.venue_id, v.state, c.concert_id 
+										   							from concerts c, venues v 
+										   							where c.venue_id=v.venue_id) y
+										   where l.username='$username' and l.concert_id=y.concert_id) 
+					and x.state in (select y.state
+									from plans_to_attend l, (select v.venue_id, v.state, c.concert_id 
+										   					 from concerts c, venues v 
+										   					 where c.venue_id=v.venue_id) y
+									where l.username='$username' and l.concert_id=y.concert_id)";
+		
+		$stmt = performQuery($conn, $sql);
+
+		$venueRecommendations = array();
+
+		while ($res = oci_fetch_assoc($stmt))
+		{
+			$venueRecommendations[] = "<li><a href='/~sks2187/w4111/concert.php/?id=".$res['CONCERT_ID']."'>".$res['NAME']."</a></li>";
+		}
+
+		return $venueRecommendations;
 	}
 
 	oci_close($conn);
@@ -133,7 +161,7 @@
 			</div>
 			<div class="row">
 				<div class="col-md-6">
-					<h4>Recommendations Based on Artist Genre</h4>
+					<h4>Because you attended concerts with these same artist genres...</h4>
 					<ul>
 						<?php
 							if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
@@ -151,20 +179,20 @@
 					</ul>
 				</div>
 				<div class="col-md-6">
-					<h4>Recommendations Based on Venue Locations</h4>
+					<h4>Because you attended concerts in these same states...</h4>
 					<ul>
 						<?php
-							// if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
-							// 	if (!empty($venueRecommendations)) {
-							// 		foreach($venueRecommendations as $a) {
-							// 			echo $a;
-							// 		}
-							// 	} else {
-							// 		echo ("<a href='/~sks2187/w4111/concert.php' class='btn btn-info'>Find some concerts to attend!</a>");
-							// 	}
-							// } else {
-							// 	echo ("<a href='/~sks2187/w4111/login.php' style='display: block; margin-top: 10px;' class='btn btn-info'>Login to attend concerts!</a>");
-							// }
+							if (isset($_SESSION['User']) && !empty($_SESSION['User'])) {
+								if (!empty($venueRecommendations)) {
+									foreach($venueRecommendations as $a) {
+										echo $a;
+									}
+								} else {
+									echo ("<a href='/~sks2187/w4111/concert.php' class='btn btn-info'>Find some concerts to attend!</a>");
+								}
+							} else {
+								echo ("<a href='/~sks2187/w4111/login.php' style='display: block; margin-top: 10px;' class='btn btn-info'>Login to attend concerts!</a>");
+							}
 						?>
 					</ul>
 				</div>
