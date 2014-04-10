@@ -14,5 +14,5 @@ The user can search our database for information on artists, concerts, and venue
 The homepage also allows them to see recommendations for other concerts they might want to attend based on either other concerts by artists in the same genre as the concerts they have been to, or concerts at venues in the same state as other venues they have been to.
 
 Possible improvements:
-*Type checking on type of input for a zip code, i.e. check to make sure the zip code entered is solely digits. 
-*Allow users to search for venues in a certain city AND state AND zip, with any of these search values optional.
+* Type checking on type of input for a zip code, i.e. check to make sure the zip code entered is solely digits. 
+* Allow users to search for venues in a certain city AND state AND zip, with any of these search values optional.
