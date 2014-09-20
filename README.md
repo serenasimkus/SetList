@@ -5,7 +5,7 @@ SetList is a website that interacts with a (limited) database of concert informa
 
 It was built for a class project, for the class COMS 4111: Introduction to Databases at Columbia University.
 
-The site can be accessed at: http://w4111e.cs.columbia.edu/~sks2187/w4111/ (while this account it still active)
+The site can be accessed at: http://w4111e.cs.columbia.edu/~sks2187/w4111/ (while this account it still active, the database has been deleted so the page appears, but with errors and there is no longer any data)
 
 The user has the ability to create an account, login, edit their information (except for their username), and then "attend" concerts and write reviews for concerts and venues. 
 
